@@ -57,6 +57,8 @@ website-foundation/
 │   └── robots.txt             # allow crawl + point to sitemap
 ├── scripts/
 │   └── verify-indexing.mjs    # zero-dep CI check: no redirects, canonical match
+├── prompts/
+│   └── seo-cross-optimize.md  # paste-ready prompts for honest E-E-A-T / authorship signals
 ├── .github/workflows/
 │   └── ci.yml                 # gitleaks secret scan + script syntax check
 ├── .gitignore                 # blocks env files, keys, secrets
@@ -88,6 +90,7 @@ website-foundation/
 | [`templates/astro.config.mjs`](./templates/astro.config.mjs) | Astro config with the load-bearing `trailingSlash: 'never'` + `build.format: 'file'` pairing. |
 | [`templates/robots.txt`](./templates/robots.txt) | Allows crawl, points at the sitemap. |
 | [`scripts/verify-indexing.mjs`](./scripts/verify-indexing.mjs) | Zero-dependency Node script that fetches every sitemap URL and fails on any redirect / non-200 / canonical mismatch. **The check that catches the indexing bug before Google does.** |
+| [`prompts/seo-cross-optimize.md`](./prompts/seo-cross-optimize.md) | Paste-ready prompts + a settings checklist for earning *honest* SEO value (entity/authorship signals, one reciprocal dofollow link) — no link schemes, no keyword stuffing. |
 
 ## For a future AI session
 

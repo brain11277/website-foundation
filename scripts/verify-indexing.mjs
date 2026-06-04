@@ -5,12 +5,14 @@
 //   node verify-indexing.mjs https://example.com
 //
 // Reads the sitemap, then fetches every listed URL with redirects DISABLED and
-// asserts:
+// asserts (failing CI red):
 //   1. status is 200 (not 3xx — the "Page with redirect" class)
 //   2. the <link rel="canonical"> self-references the fetched URL
-//   3. no accidental <meta name="robots" content="noindex"> on indexable pages
-// Exits 1 on any failure so CI fails red. This is the check that catches the
-// indexing bug BEFORE Search Console does.
+// and WARNS (non-fatal) on two things that are usually — but not always — bugs:
+//   - a missing canonical tag
+//   - a <meta name="robots" content="noindex"> on a page that's in the sitemap
+// Exits 1 on any assertion failure. This is the check that catches the indexing
+// bug BEFORE Search Console does.
 
 const base = process.argv[2];
 if (!base) {
@@ -19,7 +21,18 @@ if (!base) {
 }
 const origin = new URL(base).origin;
 
-const stripSlash = (u) => u.replace(/\/$/, '');
+// Normalize for comparison: resolve to an absolute URL, drop a trailing slash
+// on the path, and ignore a default port. This compares scheme + host + path so
+// a canonical that differs only by host/scheme (e.g. www vs apex, http vs
+// https) is caught as the mismatch it is — the exact host-split failure §1/§3
+// warn about — rather than passing on a naive string strip.
+const normalize = (u, baseUrl) => {
+  const parsed = new URL(u, baseUrl);
+  parsed.hash = '';
+  parsed.search = '';
+  parsed.pathname = parsed.pathname.replace(/\/$/, '') || '/';
+  return parsed.href;
+};
 
 async function collectSitemapUrls(origin) {
   const candidates = ['/sitemap-index.xml', '/sitemap.xml', '/sitemap-0.xml'];
@@ -92,7 +105,7 @@ for (const url of urls) {
   const tag = html.match(/<link[^>]+rel=["']canonical["'][^>]*>/i);
   if (tag) {
     const href = (tag[0].match(/href=["']([^"']+)["']/i) || [])[1];
-    if (href && stripSlash(href) !== stripSlash(url)) {
+    if (href && normalize(href, url) !== normalize(url)) {
       console.error(`FAIL  canonical ≠ url  ${url}  canonical=${href}`);
       failures++;
       continue;
