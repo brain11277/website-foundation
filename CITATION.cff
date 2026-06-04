@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this foundation, please cite it."
+title: "website-foundation"
+abstract: >-
+  A portable, content-agnostic structural baseline for shipping new websites:
+  the URL/indexing contract, SEO invariants, Cloudflare Pages deployment, and
+  the enforcement machinery that keeps them from rotting.
+type: software
+authors:
+  - given-names: Brian
+    family-names: Rain
+    website: "https://brianrain.com"
+url: "https://brianrain.com"
+repository-code: "https://github.com/brain11277/website-foundation"
+license: MIT
+keywords:
+  - technical-seo
+  - indexing
+  - sitemap
+  - astro
+  - cloudflare-pages
+  - static-site
+  - web-performance
+  - googlebot
+  - web-development
