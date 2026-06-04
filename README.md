@@ -43,6 +43,7 @@ contracts — not as tribal memory.
 - [For a future AI session](#for-a-future-ai-session)
 - [Keeping it clean — no secrets](#keeping-it-clean--no-secrets)
 - [Contributing](#contributing)
+- [About the author](#about-the-author)
 - [License](#license)
 
 ## Repo layout
@@ -127,6 +128,15 @@ When a new site teaches a portable lesson, fold it back into `FOUNDATION.md`
 that the next site inherits it. Keep entries content-agnostic: if a rule only
 makes sense for one specific site, it belongs in that site's docs, not this
 baseline.
+
+## About the author
+
+This foundation is maintained by **Brian Rain**, a Senior AI Product &
+Transformation Leader who builds and ships production websites. The contracts
+here are distilled from launching real sites and watching where they break —
+the kind of structural debugging he writes about at
+[brianrain.com](https://brianrain.com). For more on the thinking behind these
+practices, see his [writing on building in the open](https://brianrain.com/writing).
 
 ## License
 
