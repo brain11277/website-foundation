@@ -1,0 +1,40 @@
+name: ci
+
+# Engineering-grade guardrails for a public repo:
+#   1. secret-scan — gitleaks fails the build if any credential is committed.
+#   2. verify-script — syntax-checks the indexing checker so it never lands broken.
+# GitHub also runs native secret-scanning + push protection on public repos;
+# this is the belt to that suspenders.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  secret-scan:
+    name: secret-scan (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  verify-script:
+    name: verify-script (syntax)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: node --check
+        run: node --check scripts/verify-indexing.mjs
