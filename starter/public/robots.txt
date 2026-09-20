@@ -1,0 +1,7 @@
+# public/robots.txt — allow crawling, point at the sitemap.
+# Swap the domain. Do NOT Disallow indexable routes here; control noindex at the
+# page level (FOUNDATION §2) and exclude hidden routes from the sitemap instead.
+User-agent: *
+Allow: /
+
+Sitemap: https://example.com/sitemap-index.xml

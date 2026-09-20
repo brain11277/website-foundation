@@ -1,0 +1,80 @@
+---
+// ─── Fonts ───────────────────────────────────────────────────────────────────
+//
+// This starter ships a SYSTEM FONT STACK, set in tokens.css. It costs zero
+// bytes, never flashes, and looks native everywhere. That is a genuinely good
+// default and you should keep it until you have a reason not to.
+//
+// When you do want a real typeface, self-host it. A hosted font stylesheet is
+// a render-blocking request on the critical path, worth roughly a second of
+// FCP and LCP on a slow connection. Everything you need is below, commented,
+// along with the three ways this silently goes wrong.
+//
+// ─────────────────────────────────────────────────────────────────────────────
+// HOW TO TURN IT ON
+//
+//   1. npm install @fontsource-variable/inter
+//   2. Uncomment the import, the FACES constant, and the <style> at the bottom.
+//   3. Uncomment the <link rel="preload"> block.
+//   4. In tokens.css, put 'Inter' at the front of --font-sans.
+//
+// ─────────────────────────────────────────────────────────────────────────────
+// TRAP 1: do not import the package's CSS.
+//
+// `import '@fontsource-variable/inter'` looks like the obvious move and it is
+// wrong. The variable packages declare a RENAMED family: 'Inter Variable', not
+// 'Inter'. Every `font-family: 'Inter'` declaration you have silently fails to
+// match, and you get a system fallback that looks almost right.
+//
+// Import the .woff2 itself with Vite's `?url` instead. You get a same-origin,
+// content-hashed URL that is also a build-time literal, which is the only
+// shape that can be both cache-busted and named in a <link rel="preload">.
+// Then write your own @font-face with the REAL family name.
+//
+// TRAP 2: `format('woff2-variations')` alone breaks the font.
+//
+// That keyword was dropped from CSS Fonts 4. A user agent that does not
+// recognize it must skip the entire `src` line, and falls back silently. Always
+// list a plain `format('woff2')` source after it, as below.
+//
+// TRAP 3: never preload a theme-conditional face.
+//
+// Declaring an @font-face does NOT fetch it. Per CSS Fonts L4 a fetch starts
+// only when the face is selected for an element actually being laid out. So a
+// face used only under `html[data-theme="light"]` costs zero bytes for
+// everyone else, with no JS and no flash, because BaseLayout sets the theme
+// attribute before first paint.
+//
+// A <link rel="preload"> is unconditional and defeats that entirely: it
+// downloads for every visitor whether the theme is active or not. Preload ONLY
+// the faces your default view actually renders. Usually that is one.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// import interLatin from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+
+// Standard Google subset range, copied verbatim from the Fontsource CSS so the
+// download-gating behaviour matches what a hosted <link> would have done.
+// const LATIN =
+//   'U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD';
+
+// const FACES = `
+// @font-face{font-family:'Inter';font-style:normal;font-display:swap;font-weight:100 900;src:url(${interLatin}) format('woff2-variations'), url(${interLatin}) format('woff2');unicode-range:${LATIN}}
+// `.trim();
+---
+
+{/*
+  crossorigin is REQUIRED on a font preload even when the file is same-origin.
+  Fonts are always fetched in CORS mode, so without it the browser treats the
+  preloaded response as unusable and downloads the file a second time. The
+  symptom is a font that loads correctly and shows up twice in the network tab.
+
+  <link
+    rel="preload"
+    as="font"
+    type="font/woff2"
+    href={interLatin}
+    crossorigin
+  />
+*/}
+
+{/* <style is:inline set:html={FACES} /> */}

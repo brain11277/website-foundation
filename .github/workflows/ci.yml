@@ -45,3 +45,22 @@ jobs:
       # site, and the repo's own enforcement machinery is actually exercised.
       - name: fixture suite
         run: node tests/run-fixtures.mjs
+
+  verify-starter:
+    name: verify-starter (build + contracts)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: starter/package-lock.json
+      # The starter is a real Astro site, so it can be broken by a release of
+      # something it depends on without anyone touching this repo. Building it
+      # here is what stops "verified against Astro 7.3.3" from going stale
+      # silently, and it asserts the contracts the starter claims to satisfy:
+      # the indexing check, a 404 with a real body, one h1 per page, a
+      # resolving entity graph, and token parity across every theme block.
+      - name: build and verify the starter
+        run: node tests/verify-starter.mjs --build

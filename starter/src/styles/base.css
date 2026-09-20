@@ -1,0 +1,139 @@
+/* base.css
+ *
+ * Reset, accessibility boilerplate, and nothing else. No colors live here;
+ * every color comes from a token in tokens.css, which is what lets the theme
+ * blocks there override the whole site (FOUNDATION.md §4).
+ *
+ * Import order matters: tokens.css first, then this file.
+ */
+
+/* ─── Reset ───────────────────────────────────────────────────────────── */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  background: var(--bg);
+  color: var(--text-body);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; font-size: inherit; background: transparent; border: 0; }
+img, svg, video { max-width: 100%; display: block; }
+input, textarea, select { font-family: inherit; font-size: inherit; }
+
+/* Headings and lists reset to be styled deliberately rather than inheriting
+ * browser defaults that vary. If you would rather keep UA defaults for prose,
+ * delete this block and scope your own styles instead.
+ */
+h1, h2, h3, h4, h5, h6 { font-size: inherit; font-weight: inherit; }
+ul[role='list'], ol[role='list'] { list-style: none; }
+
+/* ─── Typography scale ────────────────────────────────────────────────
+ * One scale, defined once. Per-page font sizes are how two pages quietly
+ * stop matching each other.
+ */
+h1 { font-size: var(--step-4); font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; }
+h2 { font-size: var(--step-2); font-weight: 600; line-height: 1.2; }
+h3 { font-size: var(--step-1); font-weight: 600; line-height: 1.3; }
+
+p  { max-width: var(--measure); }
+
+/* ─── Selection ───────────────────────────────────────────────────────── */
+::selection {
+  background: rgba(var(--accent-rgb), 0.35);
+  color: var(--text-hi);
+}
+
+/* ─── Focus ───────────────────────────────────────────────────────────────
+ * A visible focus ring on every interactive element, as a fallback beneath
+ * any component-specific styling. Removing focus outlines without replacing
+ * them makes a site unusable by keyboard, which is the single most common
+ * serious accessibility failure on personal sites.
+ */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:not([tabindex='-1']):focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ─── Visually hidden ─────────────────────────────────────────────────────
+ * For text that screen readers should announce but sighted users should not
+ * see. Note it is NOT `display: none`, which would hide it from assistive
+ * technology too and defeat the entire point.
+ */
+.sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ─── Skip link ───────────────────────────────────────────────────────────
+ * Lets a keyboard user jump past the nav on every page. It is off-screen
+ * until focused. The matching `<main id="main" tabindex="-1">` in the layout
+ * is required: without tabindex the browser scrolls to the target but leaves
+ * focus behind in the nav, so the next Tab goes back to the second nav link.
+ */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 16px;
+  z-index: 10000;
+  padding: 12px 20px;
+  background: var(--accent-strong);
+  color: var(--on-accent);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: top 0.15s;
+}
+.skip-link:focus {
+  top: 12px;
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* ─── Layout primitives ───────────────────────────────────────────────── */
+.shell {
+  width: 100%;
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+/* ─── Reduced motion ──────────────────────────────────────────────────────
+ * Not optional. Vestibular motion disorders are real and animation can cause
+ * physical symptoms. This kills animation globally for anyone who has asked
+ * their OS to reduce it (FOUNDATION.md §7).
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

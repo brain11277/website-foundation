@@ -9,78 +9,74 @@ visiting is [`BUILDING.md`](./BUILDING.md). Do this first, then go there.
 **You need:** Node 20+, a Cloudflare account (free), git, and an AI coding tool
 if you want one. A domain is optional until step 7.
 
-*Verified end to end on 2026-09-20 against Astro 7.3.3 and @astrojs/sitemap
-3.7.4: the config below builds clean, emits the right URL shape, and passes
-`verify-indexing.mjs`.*
+*The starter is built and checked against these contracts on every commit to
+this repo, so this page cannot quietly go stale.*
 
 ---
 
-## 1. Scaffold
+## 1. Copy the starter
 
 ```bash
-npm create astro@latest my-site
+cp -R starter my-site
 cd my-site
-npm install @astrojs/sitemap
+npm install
+npm run dev
 ```
 
-Pick the minimal or empty template when prompted, and say yes to TypeScript.
-Astro is the recommendation here because it ships zero JavaScript by default,
-which is most of the performance battle already won. The contracts in
-`FOUNDATION.md` are not Astro-specific, so use something else if you prefer;
-you will just be translating the config yourself.
+That is a complete, working site: correct URL shape, a resolving structured
+data graph, a token system with two themes, full accessibility boilerplate, and
+a 404 that actually renders. It is deliberately plain, because the structure is
+what transfers and the taste is yours.
 
-## 2. Drop in the config
+Astro is the choice here because it ships zero JavaScript by default, which is
+most of the performance battle already won. The contracts in `FOUNDATION.md`
+are not Astro-specific; use something else if you prefer and translate the
+config yourself.
 
-Copy these four out of [`templates/`](./templates/):
+## 2. Make it yours
 
-| File | Goes to | Change |
-|---|---|---|
-| `astro.config.mjs` | project root | `site:` to your domain |
-| `robots.txt` | `public/robots.txt` | the `Sitemap:` domain |
-| `_headers` | `public/_headers` | nothing, unless you add prefixes |
-| `wrangler.jsonc` | project root | `name:` to your project |
+Open **`src/site.config.ts`** and work down it. Your domain, your name, your
+profiles. Everything else in the site reads from that one file, including the
+structured data, so there is nothing else to find and replace.
 
-The `trailingSlash: 'never'` plus `build.format: 'file'` pairing in the Astro
-config is load-bearing. It is the fix for the bug that started this whole repo,
-where Google reported "Page with redirect" on every page of a site that looked
-completely fine. Do not change it without reading `FOUNDATION.md` §1.
+Then `wrangler.jsonc` (the `name` field) and `public/_redirects` (pick a
+canonical host, delete the other).
+
+The `trailingSlash: 'never'` plus `build.format: 'file'` pairing in
+`astro.config.mjs` is load-bearing. It is the fix for the bug that started this
+whole repo, where Google reported "Page with redirect" on every page of a site
+that looked completely fine. Do not change it without reading `FOUNDATION.md`
+§1.
 
 ## 3. Tell your AI what the rules are
 
-If you are building with an AI tool, this is the highest-leverage two minutes in
-the whole process. Create `CLAUDE.md` (or `AGENTS.md`) in the project root:
+The starter already ships a `CLAUDE.md` wired to the baseline: it points at the
+raw contracts, states the workflow, and carries the conventions and a starter
+regression registry.
 
-```markdown
-# CLAUDE.md
+Three sections in it are marked **FILL THIS IN**, and they are the highest
+leverage two minutes in this whole process:
 
-## The baseline
-Read and hold the structural contracts at:
-https://raw.githubusercontent.com/brain11277/website-foundation/main/FOUNDATION.md
+- **What this site is**, and explicitly what it is not.
+- **Voice.** Do this before any copy exists.
+- **Regression registry.** Starts with one worked row; add to it as you go.
 
-Deployment specifics:
-https://raw.githubusercontent.com/brain11277/website-foundation/main/CLOUDFLARE.md
-
-## Workflow (non-negotiable)
-Sync (git fetch, confirm not behind) -> Explore -> Plan in plan mode, no code
--> Code only after I approve -> Commit.
-
-## This site
-<one paragraph: who it is for, what it is for, what it is not>
-
-## Voice
-<see BUILDING.md; write this before you write any copy>
-```
-
-Without this the model will cheerfully generate a site that violates half the
-contracts, and you will not notice until Search Console tells you months later.
+Without those filled in, the model will cheerfully generate a site that reads
+like every other generated site, and it will pass every automated check in this
+repo while doing it.
 
 ## 4. Build something
 
-Stop here and read [`BUILDING.md`](./BUILDING.md) for the page set, the design
-tokens, and the voice guide. Come back when you have pages worth deploying.
+The starter ships a homepage, an about page, a contact page and a 404 with
+placeholder copy. Replace them with something only you could have written.
 
-The minimum for this quickstart to mean anything: a homepage, a real `404.astro`,
-and one content page.
+Before you write any of it, read **[`BUILDING.md`](./BUILDING.md)**: the page
+set, the token system, and the voice guide. The voice guide in particular is
+worth doing first rather than after, because rewriting generated copy costs
+more than steering it did.
+
+`CLAUDE.md` in the starter has three sections marked FILL THIS IN for exactly
+this.
 
 ## 5. Deploy
 

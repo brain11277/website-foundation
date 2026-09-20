@@ -12,47 +12,15 @@
 // Fixtures use an __ORIGIN__ placeholder because the port is ephemeral; it is
 // substituted at serve time, which also keeps the fixture files readable.
 
-import { createServer } from 'node:http';
-import { readFile } from 'node:fs/promises';
-import { spawn } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { serveDir, originOf, runVerifier, indent } from './lib/serve.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const verifier = join(here, '..', 'scripts', 'verify-indexing.mjs');
-
-function serveFixture(dir) {
-  return new Promise((resolve) => {
-    const server = createServer(async (req, res) => {
-      const name = req.url === '/' ? 'index.html' : req.url.slice(1).split('?')[0];
-      const origin = `http://127.0.0.1:${server.address().port}`;
-      try {
-        const body = await readFile(join(here, 'fixtures', dir, name), 'utf8');
-        const type = name.endsWith('.xml') ? 'application/xml' : 'text/html';
-        res.writeHead(200, { 'content-type': type });
-        res.end(body.replaceAll('__ORIGIN__', origin));
-      } catch {
-        res.writeHead(404, { 'content-type': 'text/html' });
-        res.end('<!DOCTYPE html><title>Not found</title>');
-      }
-    });
-    server.listen(0, '127.0.0.1', () => resolve(server));
-  });
-}
-
-function runVerifier(origin) {
-  return new Promise((resolve) => {
-    const child = spawn(process.execPath, [verifier, origin], { stdio: ['ignore', 'pipe', 'pipe'] });
-    let out = '';
-    child.stdout.on('data', (d) => (out += d));
-    child.stderr.on('data', (d) => (out += d));
-    child.on('close', (code) => resolve({ code, out }));
-  });
-}
 
 async function check(dir, expected, label) {
-  const server = await serveFixture(dir);
-  const origin = `http://127.0.0.1:${server.address().port}`;
+  const server = await serveDir(join(here, 'fixtures', dir));
+  const origin = originOf(server);
   const { code, out } = await runVerifier(origin);
   await new Promise((r) => server.close(r));
 
@@ -61,7 +29,7 @@ async function check(dir, expected, label) {
     return true;
   }
   console.error(`FAIL  ${label}: expected exit ${expected}, got ${code}`);
-  console.error(out.split('\n').map((l) => `        ${l}`).join('\n'));
+  console.error(indent(out));
   return false;
 }
 

@@ -1,0 +1,68 @@
+---
+import { site } from '../site.config';
+
+const year = new Date().getFullYear();
+
+// Only profiles you actually control. These are the HTML half of the identity
+// claim your Person schema makes in `sameAs`.
+//
+// The nav below is labeled, because a page with more than one <nav> gives a
+// screen reader user no way to tell them apart otherwise.
+//
+// rel="me" is the non-obvious part. It is how you assert "this account is also
+// me" in a machine-checkable way, and it is the HTML complement to the
+// `sameAs` array in the Person schema. Services that do identity verification
+// look for exactly this, and the two-way link (your site points at the
+// profile, the profile points back) is what turns an assertion into a claim.
+const elsewhere = site.author.sameAs;
+---
+<footer>
+  <div class="shell inner">
+    <p class="copy">© {year} {site.name}</p>
+
+    {elsewhere.length > 0 && (
+      <nav class="elsewhere" aria-label="Profiles elsewhere">
+        {elsewhere.map((url) => (
+          <a href={url} rel="noopener noreferrer me" target="_blank">
+            {new URL(url).hostname.replace(/^www\./, '')}
+          </a>
+        ))}
+      </nav>
+    )}
+  </div>
+</footer>
+
+<style>
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 0;
+    color: var(--text-muted);
+    font-size: var(--step--1);
+  }
+
+  .inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .copy { max-width: none; }
+
+  .elsewhere {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  /* Underline on hover and focus, not just a color change. In reader mode the
+     muted and accent tokens are both near-black, so a color-only hover leaves
+     that mode with no perceptible affordance at all. */
+  .elsewhere a:hover,
+  .elsewhere a:focus-visible {
+    color: var(--text-hi);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+</style>

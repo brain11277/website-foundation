@@ -9,7 +9,7 @@ site worth visiting from a generated one, and the structural contracts that keep
 it correct. Written to be handed straight to an AI coding tool.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
-[![Dependencies](https://img.shields.io/badge/dependencies-none-brightgreen.svg)](./scripts/verify-indexing.mjs)
+[![Checker: zero deps](https://img.shields.io/badge/checker-zero--deps-brightgreen.svg)](./scripts/verify-indexing.mjs)
 [![Secret scan](https://img.shields.io/badge/secret--scan-gitleaks-blueviolet.svg)](./.github/workflows/ci.yml)
 [![CI](https://github.com/brain11277/website-foundation/actions/workflows/ci.yml/badge.svg)](https://github.com/brain11277/website-foundation/actions/workflows/ci.yml)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
@@ -50,9 +50,10 @@ contracts — not as tribal memory.
 
 ## Start here
 
-**Building a site?** Go to **[`QUICKSTART.md`](./QUICKSTART.md)** and come back
-when it is deployed. It is the shortest correct path from an empty directory to
-a live site on your domain, roughly 30 to 45 minutes.
+**Building a site?** Copy **[`starter/`](./starter/)** and follow
+**[`QUICKSTART.md`](./QUICKSTART.md)**. That is the shortest correct path from
+nothing to a live site on your domain, roughly 30 to 45 minutes, most of it
+waiting on DNS.
 
 **Want it to be good, not just correct?** **[`BUILDING.md`](./BUILDING.md)** is
 the page set, the design token system, the voice guide, and the working loop.
@@ -64,6 +65,7 @@ forgettable.
 point `verify-indexing.mjs` at production.
 
 ```
+starter/       ->  a working site to copy
 QUICKSTART.md  ->  nothing to a deployed site
 BUILDING.md    ->  deployed to worth visiting
 FOUNDATION.md  ->  the contracts, and why each one exists
@@ -77,6 +79,7 @@ Everything here is MIT and meant to be copied. See
 
 ```
 website-foundation/
+├── starter/                   # a complete working site: copy it, make it yours
 ├── QUICKSTART.md              # nothing -> a deployed site on your domain
 ├── BUILDING.md                # deployed -> worth visiting: pages, tokens, voice, loop
 ├── FOUNDATION.md              # structural contracts + pre-launch checklist
@@ -107,6 +110,7 @@ website-foundation/
 
 | File | What it gives you |
 |---|---|
+| [`starter/`](./starter/) | **A complete, working Astro site.** Correct URL shape, a resolving JSON-LD entity graph, a token system with two themes in parity, full a11y boilerplate, security headers, and a 404 that actually renders. Deliberately plain: the structure is done, the taste is yours. Built and checked in CI on every commit. |
 | [`QUICKSTART.md`](./QUICKSTART.md) | The shortest correct path from an empty directory to a live site: scaffold, config, deploy, custom domain, verify. Includes the "where things go wrong" table for the six failures that account for most of them. |
 | [`BUILDING.md`](./BUILDING.md) | The part that decides whether anyone comes back: choosing a page set and cutting hard, building a design token system before the first screen, **writing a voice guide so your AI stops generating anonymous copy**, the Sync→Plan→Code loop, and what personality costs in accessibility terms. |
 | [`FOUNDATION.md`](./FOUNDATION.md) | The contracts: URL/indexing, crawlability, per-page SEO, theme-token parity, pipeline health, enforcement machinery, a11y — **plus a pre-launch checklist.** |

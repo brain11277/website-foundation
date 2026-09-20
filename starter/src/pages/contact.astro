@@ -1,0 +1,70 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { contactPageSchema } from '../utils/seo';
+
+const pageDescription =
+  'How to reach me, what I am interested in hearing about, and what I am not. Saying both is what makes a contact page useful.';
+
+const pageTitle = 'How to reach me, and what I am looking for';
+---
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  active="contact"
+  schema={contactPageSchema({ pathname: Astro.url.pathname, description: pageDescription })}
+>
+  <div class="shell">
+    <h1>Contact</h1>
+
+    <p>
+      A contact page is a filter, not a form. Say who you want to hear from and
+      who you do not; that single act of specificity does more for how a site
+      reads than any amount of design.
+    </p>
+
+    <h2>Good fit</h2>
+    <ul class="list">
+      <li>Replace with the conversations you actually want</li>
+    </ul>
+
+    <h2>Not a fit</h2>
+    <ul class="list">
+      <li>Replace with the pitches you would rather not receive</li>
+    </ul>
+
+    <p class="note">
+      Add a real address or form here. A static site has no server, so a form
+      needs either a form service or a Worker endpoint. See CLOUDFLARE.md for
+      when a Worker script is justified.
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  h1 { margin-bottom: 24px; }
+  h2 { margin: 40px 0 16px; }
+  p { margin-bottom: 16px; }
+  .list { list-style: none; max-width: var(--measure); }
+  .list li {
+    padding: 8px 0 8px 20px;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+  }
+  .list li::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 17px;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .note {
+    margin-top: 40px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-muted);
+    background: var(--surface);
+    max-width: var(--measure);
+  }
+</style>

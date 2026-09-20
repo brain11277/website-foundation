@@ -1,0 +1,54 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { profilePageSchema } from '../utils/seo';
+
+const pageDescription =
+  'Who I am and what I work on, in enough detail to tell whether we would be useful to each other. Replace this with your own story.';
+
+// Descriptive, not a nav label. "About" plus a short site name lands around
+// 18 characters, well under the 30 to 60 window, and tells a searcher nothing.
+const pageTitle = 'Background and how I work';
+---
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  active="about"
+  schema={profilePageSchema()}
+>
+  <div class="shell">
+    <h1>About</h1>
+
+    <p>
+      Replace this with your actual story. BUILDING.md §4 is the argument for
+      writing a voice guide first: without one you get prose that could be
+      about anyone, on the page that is supposed to be most about you.
+    </p>
+
+    <p>
+      Be specific. A sentence that would work equally well on someone else's
+      site is a sentence to cut.
+    </p>
+
+    <h2>Elsewhere</h2>
+    <p>
+      Add your profiles to <code>author.sameAs</code> in
+      <code>src/site.config.ts</code>. They appear in the footer with
+      <code>rel="me"</code> and in the Person schema, which is how a search
+      engine connects those accounts to one entity.
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  h1 { margin-bottom: 24px; }
+  h2 { margin: 40px 0 16px; }
+  p { margin-bottom: 16px; }
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 5px;
+  }
+</style>

@@ -1,0 +1,83 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../site.config';
+
+// One constant, used for BOTH the meta description and any schema description
+// on this page, so the two cannot drift. 110 to 160 characters (FOUNDATION §3).
+const pageDescription =
+  'A starting point for a personal site: correct indexing, real design tokens, and accessibility that works, with the content left to you.';
+
+// A title is written for someone reading a search result, not for the nav.
+// "Home" tells a searcher nothing and burns none of the 30 to 60 character
+// budget usefully. The homepage is also the one page where the site name
+// belongs IN the title rather than appended to it, hence noSuffix.
+const pageTitle = `${site.name}, ${site.author.jobTitle}`;
+---
+<BaseLayout title={pageTitle} description={pageDescription} active="home" noSuffix>
+  <div class="shell">
+    {/* Exactly one h1 per page. Section headings are h2. No level skips. */}
+    <h1>{site.name}</h1>
+
+    <p class="lede">
+      This is the starter from <strong>website-foundation</strong>. It is
+      deliberately plain: the structure is correct and the taste is yours to
+      add.
+    </p>
+
+    <h2>What is already handled</h2>
+    <ul class="list">
+      <li>Canonical URLs, sitemap and a resolving JSON-LD entity graph</li>
+      <li>A token system with two themes that stay in parity</li>
+      <li>Skip link, focus rings, reduced motion, 24px targets</li>
+      <li>Security and cache headers, and a 404 that actually renders</li>
+    </ul>
+
+    <h2>What to do next</h2>
+    <ol class="list">
+      <li>Edit <code>src/site.config.ts</code>. Everything reads from it.</li>
+      <li>Write your voice guide in <code>CLAUDE.md</code> before any copy.</li>
+      <li>Replace this page with something only you could have written.</li>
+    </ol>
+  </div>
+</BaseLayout>
+
+<style>
+  .lede {
+    font-size: var(--step-1);
+    color: var(--text-hi);
+    margin: 24px 0 48px;
+  }
+
+  h2 {
+    margin: 40px 0 16px;
+  }
+
+  .list {
+    list-style: none;
+    max-width: var(--measure);
+  }
+  .list li {
+    padding: 8px 0 8px 20px;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+  }
+  .list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 17px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 5px;
+  }
+</style>
