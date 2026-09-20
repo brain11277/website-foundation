@@ -220,6 +220,10 @@ incident in §1, the additive `_headers` bug, the fonts that silently fell back,
 the canvas that rasterized 97 MiB of sprites for a hidden element. If you want
 to see what the end of this path looks like, that is it.
 
+This repo is listed on its [projects page](https://brianrain.com/projects)
+alongside the other things built there, if you want the short version of what
+it is before reading any of the docs.
+
 ## License
 
 [MIT](./LICENSE) © Brian Rain. Use it, fork it, adapt it for any project.
