@@ -126,6 +126,10 @@ content. Five layers each looked correct but disagreed on the URL shape:
 - **Every color custom property in `:root` must be redefined in every theme/mode
   block.** A `:root` token without matching overrides in each theme = the wrong
   color in those themes. This is the #1 source of multi-theme visual drift.
+  Don't rely on remembering: `scripts/verify-token-parity.mjs` checks it.
+  Watch the RGB channel triplets in particular. A bare `139, 92, 246` does not
+  look like a color to a casual read, so it is the token that gets forgotten,
+  and it is wrong everywhere it is composed into an `rgba()`.
 - **Shared visual classes live in ONE global stylesheet.** Per-page `<style>`
   blocks are for layout-only declarations.
 - **Audit-before-edit:** grep a class before changing it. If it appears in >1
@@ -187,7 +191,9 @@ If the site pulls from any cron/sync (RSS, API, scraped feed):
 - **Health monitor** for any automated data sync, separate from the sync
   itself. Drop-in: `templates/workflows/data-health.yml` (§5).
 - **`verify-indexing.mjs` wired into CI** and run against every preview/prod
-  deploy. It enforces contract §1 + §2 automatically.
+  deploy. It enforces contract §1 + §2 + the §3 entity graph automatically.
+- **`verify-token-parity.mjs` wired into CI** against your token stylesheet.
+  It enforces §4, which is otherwise the easiest contract to break silently.
 - **Workflow discipline:** Sync → Explore → Plan → Code → Commit. Sync before
   exploring; designing on a stale base is the most expensive class of error.
 
@@ -257,6 +263,7 @@ Build & host
 - [ ] environment variables set in **both** Production and Preview
 
 Quality
+- [ ] `verify-token-parity.mjs` passes against your token stylesheet
 - [ ] `prefers-reduced-motion` honored
 - [ ] keyboard navigation works end-to-end; focus is always visible
 - [ ] Lighthouse ≥ targets (Perf/A11y/Best-Practices/SEO), every page, both form factors

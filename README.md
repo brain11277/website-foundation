@@ -94,7 +94,8 @@ website-foundation/
 │   └── workflows/
 │       └── data-health.yml    # dead-man's-switch for an automated sync (§5)
 ├── scripts/
-│   └── verify-indexing.mjs    # zero-dep CI check: redirects, canonical, JSON-LD @id graph
+│   ├── verify-indexing.mjs    # zero-dep CI check: redirects, canonical, JSON-LD @id graph
+│   └── verify-token-parity.mjs # zero-dep CI check: every color token themed (§4)
 ├── tests/
 │   ├── run-fixtures.mjs       # runs the verifier against local fixtures; no network
 │   └── fixtures/              # one site that must pass, one that must fail
@@ -122,6 +123,7 @@ website-foundation/
 | [`templates/hooks/session-start.sh`](./templates/hooks/session-start.sh) | FOUNDATION §6 as a real hook: refuses to let a session start on a stale base, then verifies your regression markers still exist. |
 | [`templates/workflows/data-health.yml`](./templates/workflows/data-health.yml) | FOUNDATION §5 as a real workflow: asserts your synced data is fresh and **opens an issue** when it isn't, because the dangerous failure is a sync that goes green while doing nothing. |
 | [`scripts/verify-indexing.mjs`](./scripts/verify-indexing.mjs) | Zero-dependency Node script that fetches every sitemap URL and fails on any redirect, non-200, canonical mismatch, or **unresolved JSON-LD `@id`**. Warns on missing `lastmod`, stray `noindex`, `<h1>` count, and title/description length. **The check that catches the indexing bug before Google does.** |
+| [`scripts/verify-token-parity.mjs`](./scripts/verify-token-parity.mjs) | Zero-dependency checker for §4: every color token in `:root` must be redefined in every theme block. Knows that a bare `139, 92, 246` channel triplet is a color, which is the token people forget. |
 | [`tests/run-fixtures.mjs`](./tests/run-fixtures.mjs) | Runs the verifier for real against local fixtures over Node's built-in http server, so the enforcement machinery is itself enforced. No network, no live site. |
 | [`prompts/seo-cross-optimize.md`](./prompts/seo-cross-optimize.md) | Paste-ready prompts + a settings checklist for earning *honest* SEO value (entity/authorship signals, one reciprocal dofollow link) — no link schemes, no keyword stuffing. |
 

@@ -23,7 +23,9 @@ npm run dev
 4. **`CLAUDE.md`.** Three sections marked FILL THIS IN. Do the voice one before
    you write any copy, not after.
 5. **`src/styles/tokens.css`.** Your colors. Re-measure contrast when you change
-   them; the file lists the ratios the current values were verified at.
+   them; the file lists the ratios the current values were verified at. Then run
+   `npm run verify:tokens`, which catches a token you themed in one block and
+   forgot in another.
 6. **`src/pages/`.** Replace the placeholder copy with something only you could
    have written.
 7. **`public/og/default.png`.** A real 1200x630 card. A social link with a
@@ -55,6 +57,10 @@ curl -s -o /dev/null -w '%{http_code} %{size_download}\n' https://yoursite/nope
 
 # Every sitemap URL 200, canonical self-referencing, no dangling @id.
 npm run verify -- https://yoursite
+
+# Every color token redefined in every theme block. Run this after any
+# change to tokens.css, not just before a deploy.
+npm run verify:tokens
 ```
 
 ## Fonts
@@ -84,6 +90,8 @@ src/
 ├── data/types.ts         shapes for structured content
 └── pages/                index, about, contact, 404
 
-scripts/verify-indexing.mjs   the indexing checker, bundled so
-                              `npm run verify` needs nothing installed
+scripts/
+├── verify-indexing.mjs   bundled, so `npm run verify` needs
+│                         nothing installed
+└── verify-token-parity.mjs   `npm run verify:tokens`
 ```

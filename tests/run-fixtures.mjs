@@ -14,6 +14,7 @@
 
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { spawn } from 'node:child_process';
 import { serveDir, originOf, runVerifier, indent } from './lib/serve.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -33,6 +34,32 @@ async function check(dir, expected, label) {
   return false;
 }
 
+/** Run an arbitrary checker script and assert its exit code. */
+function runScript(script, args) {
+  return new Promise((resolve) => {
+    const child = spawn(process.execPath, [join(here, '..', 'scripts', script), ...args], {
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    let out = '';
+    child.stdout.on('data', (d) => (out += d));
+    child.stderr.on('data', (d) => (out += d));
+    child.on('close', (code) => resolve({ code, out }));
+  });
+}
+
+async function checkScript(script, args, expected, label) {
+  const { code, out } = await runScript(script, args);
+  if (code === expected) {
+    console.log(`PASS  ${label} (exit ${code})`);
+    return true;
+  }
+  console.error(`FAIL  ${label}: expected exit ${expected}, got ${code}`);
+  console.error(indent(out));
+  return false;
+}
+
+const css = (n) => join(here, 'fixtures', 'css', n);
+
 const results = [
   await check('good', 0, 'a correct site passes'),
   await check('bad', 1, 'an @id pointing at a document that does not exist fails'),
@@ -42,6 +69,12 @@ const results = [
   await check('cross-doc-ok', 0, 'an @id resolved on another page of the site passes'),
   // The original bug class, and the one that must stay a hard failure.
   await check('same-doc-dangling', 1, 'an @id referencing this same page, undefined, fails'),
+
+  // Token parity (FOUNDATION §4). The ok fixture deliberately includes a rule
+  // scoped BY a theme and an unrelated attribute selector, because both were
+  // false positives during development.
+  await checkScript('verify-token-parity.mjs', [css('parity-ok.css')], 0, 'a stylesheet in parity passes'),
+  await checkScript('verify-token-parity.mjs', [css('parity-broken.css')], 1, 'a missing theme override fails'),
 ];
 
 if (results.every(Boolean)) {

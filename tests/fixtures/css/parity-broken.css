@@ -1,0 +1,13 @@
+/* --accent-rgb is missing from the light theme. A bare channel triplet does
+   not look like a color to a naive check, which is exactly why it gets
+   forgotten and why this fixture uses it. */
+:root {
+  --bg: #101018;
+  --text: #EDEDF2;
+  --accent-rgb: 139, 92, 246;
+}
+
+html[data-theme='light'] {
+  --bg: #FFFFFF;
+  --text: #16161A;
+}
