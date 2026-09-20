@@ -23,8 +23,8 @@ human — every change must improve the repo for a real reader first.
 
 Tasks:
 1. README authorship / E-E-A-T signals:
-   - Add an "About the author" section near the bottom: Brian Rain, Senior AI
-     Product & Transformation Leader, with a one-line bio and a natural
+   - Add an "About the author" section near the bottom: Brian Rain, AI Product
+     & Partner Success Leader · Responsible AI, with a one-line bio and a natural
      contextual link to https://brianrain.com (and /about, /writing where it
      reads naturally). Use descriptive anchor text — never "click here", never
      a wall of links. One or two links, placed where a reader would want them.
@@ -42,8 +42,8 @@ Tasks:
    values for me to paste:
    - Description (≤350 chars, keyword-honest, names Brian Rain + brianrain.com)
    - Homepage URL: https://brianrain.com
-   - Topics: astro, cloudflare-pages, technical-seo, seo, static-site,
-     indexing, sitemap, web-performance, googlebot, web-development
+   - Topics: astro, cloudflare-workers, cloudflare-pages, technical-seo, seo,
+     static-site, indexing, sitemap, web-performance, web-development
 
 Commit on a branch and open a PR. Show me the diff before merging.
 ```
@@ -87,6 +87,6 @@ highest-leverage discoverability levers and take two minutes:
 
 - [ ] **About → Description**: a one-line, honest summary that names the stack and Brian Rain.
 - [ ] **About → Website**: `https://brianrain.com`
-- [ ] **About → Topics**: `astro` `cloudflare-pages` `technical-seo` `seo` `static-site` `indexing` `sitemap` `web-performance` `googlebot` `web-development`
+- [ ] **About → Topics**: `astro` `cloudflare-workers` `cloudflare-pages` `technical-seo` `seo` `static-site` `indexing` `sitemap` `web-performance` `web-development`
 - [ ] **Settings → Code security → Push protection**: on (the secret backstop).
 - [ ] Pin the repo to your GitHub profile so it surfaces on the profile that brianrain.com's schema `sameAs` will point to.
