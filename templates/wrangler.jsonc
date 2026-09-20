@@ -1,0 +1,57 @@
+// wrangler.jsonc: Workers Assets config for a static site.
+//
+// This file IS committed, so never put a secret in it. Runtime secrets go in
+// `npx wrangler secret put <NAME>`. Note that anything here is public to
+// anyone who can read the repo, including KV namespace IDs and any address
+// you configure, so treat those as identifiers rather than credentials.
+//
+// See CLOUDFLARE.md "Path A" for the reasoning behind each setting.
+{
+  "name": "example-site",
+  // Set this to the date you created the project, then leave it alone. It
+  // pins runtime behavior; bumping it casually can change semantics.
+  "compatibility_date": "2026-01-01",
+
+  "assets": {
+    "directory": "./dist",
+
+    // THE ONE THAT BITES COMING FROM PAGES. Pages auto-detected a 404.html;
+    // Workers does not, and the default is "none". Leave this out and every
+    // unmatched URL returns an empty-bodied 404 forever, while your styled
+    // 404 page sits in the build doing nothing. Use "single-page-application"
+    // instead if the app routes client-side.
+    //
+    // Verify it rather than trusting it:
+    //   curl -s -o /dev/null -w '%{http_code} %{size_download}\n' https://example.com/nope
+    // A zero byte count means this is wrong.
+    "not_found_handling": "404-page"
+
+    // html_handling defaults to "auto-trailing-slash", which serves foo.html
+    // without a slash and foo/index.html with one. That is why Astro's
+    // build.format: 'file' works here with no extra config (FOUNDATION §1).
+    // Set "drop-trailing-slash" if you want the host to enforce it explicitly.
+    // "html_handling": "drop-trailing-slash",
+
+    // `binding` is ONLY valid alongside `main`. On an assets-only Worker it is
+    // a config error, so it stays commented out until there is a script.
+    // "binding": "ASSETS",
+
+    // Makes the script run BEFORE static-asset resolution. Only needed when
+    // the script must serve routes that collide with root assets (/,
+    // /favicon.svg, /robots.txt). Everything else still falls through to
+    // env.ASSETS.fetch(request).
+    // "run_worker_first": true
+  }
+
+  // ─── Everything below is for when a static build genuinely is not enough ───
+  //
+  // "main": "worker/index.ts",
+  //
+  // KV read caches: read-then-merge, never replace wholesale (FOUNDATION §5),
+  // or records roll off the moment the upstream window moves.
+  // "kv_namespaces": [{ "binding": "CACHE", "id": "<kv-namespace-id>" }],
+  //
+  // Scheduled work. Match the cadence to how fast the source actually moves,
+  // and pair it with the dead-man's-switch in templates/workflows/.
+  // "triggers": { "crons": ["0 * * * *"] }
+}

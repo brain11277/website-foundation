@@ -1,0 +1,95 @@
+# FOUNDATION §5, made real: the dead-man's-switch for an automated data sync.
+#
+# Drop this at .github/workflows/data-health.yml and set the four values in
+# env below. It is deliberately SEPARATE from the sync workflow it watches.
+# A monitor that lives inside the thing it monitors fails with it.
+#
+# The failure this exists to catch is not a sync that errors. It is a sync
+# that goes GREEN WHILE DOING NOTHING: a cached upstream response, a partial
+# success, a push that silently no-ops. Nothing turns red, and the site quietly
+# serves stale data until a human happens to notice.
+#
+# Two things here are load-bearing and look removable:
+#   - The issue creation. Without it the alarm is a workflow-failure email,
+#     which is the easiest notification in the world to ignore.
+#   - `set -euo pipefail`. Without it a failing jq silently yields an empty
+#     string, the arithmetic below evaluates strangely, and the check passes.
+
+name: Data health check
+
+on:
+  schedule:
+    # Pick a time offset from your publish window, so a normal publish has
+    # landed before the check runs. Note GitHub Actions cron drifts by
+    # several minutes under load; do not schedule this tight against a
+    # deadline.
+    - cron: '0 15 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  # The file the sync writes.
+  DATA_FILE: public/data/items.json
+  # A jq expression selecting the newest timestamp in that file.
+  NEWEST_EXPR: '.[0].date'
+  # How stale is too stale, in hours. CALIBRATE THIS to your publish cadence
+  # rather than picking a round number. If you publish Mon/Wed/Fri, the
+  # Friday-to-Monday gap is already 72h, so a 72h threshold stays green
+  # through a normal weekend and trips on the first genuinely missed run.
+  # Raising it to "stop the noise" is how silent failure gets re-buried.
+  MAX_AGE_HOURS: '72'
+  # Label applied to the issue this opens.
+  ISSUE_LABEL: sync-broken
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Assert the data file is fresh
+        id: assert
+        run: |
+          set -euo pipefail
+          newest=$(jq -r "$NEWEST_EXPR" "$DATA_FILE")
+          if [ -z "$newest" ] || [ "$newest" = "null" ]; then
+            echo "::error::Could not read a timestamp from $DATA_FILE via $NEWEST_EXPR"
+            exit 1
+          fi
+          newest_epoch=$(date -d "$newest" +%s)
+          now_epoch=$(date +%s)
+          age_hours=$(( (now_epoch - newest_epoch) / 3600 ))
+          echo "newest=$newest" >> "$GITHUB_OUTPUT"
+          echo "age_hours=$age_hours" >> "$GITHUB_OUTPUT"
+          echo "Newest entry: $newest (${age_hours}h old, threshold ${MAX_AGE_HOURS}h)"
+          if [ "$age_hours" -gt "$MAX_AGE_HOURS" ]; then
+            echo "::error::$DATA_FILE is ${age_hours}h old (threshold ${MAX_AGE_HOURS}h). The sync pipeline is likely broken."
+            exit 1
+          fi
+
+      - name: Open an issue on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const newest = '${{ steps.assert.outputs.newest }}' || 'unknown';
+            const age = '${{ steps.assert.outputs.age_hours }}' || 'unknown';
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Sync pipeline likely broken, newest entry is ${newest} (${age}h old)`,
+              body: [
+                'The data-health workflow failed at ' + new Date().toISOString() + '.',
+                '',
+                '**Newest entry:** ' + newest + ' (' + age + 'h old).',
+                '',
+                'Work the diagnosis playbook in CLAUDE.md to find which layer is stale.',
+                '',
+                'Failed run: ' + runUrl,
+              ].join('\n'),
+              labels: [process.env.ISSUE_LABEL || 'sync-broken'],
+            });
