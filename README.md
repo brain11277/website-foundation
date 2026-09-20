@@ -51,7 +51,7 @@ contracts — not as tribal memory.
 ```
 website-foundation/
 ├── FOUNDATION.md              # structural contracts + pre-launch checklist
-├── CLOUDFLARE.md              # Pages + Workers setup, the trailing-slash gotcha
+├── CLOUDFLARE.md              # Workers Assets / Pages setup, the contracts that bite on both
 ├── templates/
 │   ├── astro.config.mjs       # trailingSlash:'never' + build.format:'file'
 │   └── robots.txt             # allow crawl + point to sitemap
@@ -71,12 +71,13 @@ website-foundation/
    repo's `CLAUDE.md` / `AGENTS.md`.
 2. Drop **[`templates/astro.config.mjs`](./templates/astro.config.mjs)** and
    **[`templates/robots.txt`](./templates/robots.txt)** in (swap the domain).
-3. Follow **[`CLOUDFLARE.md`](./CLOUDFLARE.md)** to stand up Pages (and a Worker
-   only if you actually need server-side behavior).
+3. Follow **[`CLOUDFLARE.md`](./CLOUDFLARE.md)** to stand up hosting (Workers
+   Assets by default; a Worker script only if you actually need server-side
+   behavior).
 4. Add **[`scripts/verify-indexing.mjs`](./scripts/verify-indexing.mjs)** and run
-   it against the preview deploy in CI:
+   it against a preview or production deploy in CI:
    ```bash
-   node scripts/verify-indexing.mjs https://your-preview-url.pages.dev
+   node scripts/verify-indexing.mjs https://your-deploy-url.example.com
    ```
 5. Walk the **Pre-launch checklist** at the bottom of `FOUNDATION.md` before
    going live.
@@ -86,7 +87,7 @@ website-foundation/
 | File | What it gives you |
 |---|---|
 | [`FOUNDATION.md`](./FOUNDATION.md) | The contracts: URL/indexing, crawlability, per-page SEO, theme-token parity, pipeline health, enforcement machinery, a11y — **plus a pre-launch checklist.** |
-| [`CLOUDFLARE.md`](./CLOUDFLARE.md) | Cloudflare Pages + Workers setup: project config, the trailing-slash gotcha, DNS / custom domain, when a Worker is justified, deploy verification. |
+| [`CLOUDFLARE.md`](./CLOUDFLARE.md) | Cloudflare setup, Workers Assets by default with Pages as a supported alternative: stack choice, the contracts that bite on both (URL shape, additive `_headers`, one canonical host), config for each path, deploy verification. |
 | [`templates/astro.config.mjs`](./templates/astro.config.mjs) | Astro config with the load-bearing `trailingSlash: 'never'` + `build.format: 'file'` pairing. |
 | [`templates/robots.txt`](./templates/robots.txt) | Allows crawl, points at the sitemap. |
 | [`scripts/verify-indexing.mjs`](./scripts/verify-indexing.mjs) | Zero-dependency Node script that fetches every sitemap URL and fails on any redirect / non-200 / canonical mismatch. **The check that catches the indexing bug before Google does.** |
@@ -134,8 +135,9 @@ baseline.
 
 ## About the author
 
-This foundation is maintained by **Brian Rain**, a Senior AI Product &
-Transformation Leader who builds and ships production websites. The contracts
+This foundation is maintained by **Brian Rain**, an AI Product & Partner
+Success Leader working on Responsible AI, who builds and ships production
+websites. The contracts
 here are distilled from launching real sites and watching where they break —
 the kind of structural debugging he writes about at
 [brianrain.com](https://brianrain.com). For more on the thinking behind these
