@@ -53,8 +53,14 @@ website-foundation/
 ├── FOUNDATION.md              # structural contracts + pre-launch checklist
 ├── CLOUDFLARE.md              # Workers Assets / Pages setup, the contracts that bite on both
 ├── templates/
-│   ├── astro.config.mjs       # trailingSlash:'never' + build.format:'file'
-│   └── robots.txt             # allow crawl + point to sitemap
+│   ├── astro.config.mjs       # trailingSlash:'never' + build.format:'file', date-only lastmod
+│   ├── wrangler.jsonc         # Workers Assets config, incl. the not_found_handling trap
+│   ├── _headers               # security + cache baseline; why the rules are additive
+│   ├── robots.txt             # allow crawl + point to sitemap
+│   ├── hooks/
+│   │   └── session-start.sh   # stale-base check + regression-marker verification (§6)
+│   └── workflows/
+│       └── data-health.yml    # dead-man's-switch for an automated sync (§5)
 ├── scripts/
 │   └── verify-indexing.mjs    # zero-dep CI check: no redirects, canonical match
 ├── prompts/
@@ -69,8 +75,9 @@ website-foundation/
 
 1. Copy the contracts from **[`FOUNDATION.md`](./FOUNDATION.md)** into the new
    repo's `CLAUDE.md` / `AGENTS.md`.
-2. Drop **[`templates/astro.config.mjs`](./templates/astro.config.mjs)** and
-   **[`templates/robots.txt`](./templates/robots.txt)** in (swap the domain).
+2. Drop the **[`templates/`](./templates/)** files in and swap the domain:
+   `astro.config.mjs`, `robots.txt`, `_headers`, and `wrangler.jsonc` if you
+   are on Workers Assets.
 3. Follow **[`CLOUDFLARE.md`](./CLOUDFLARE.md)** to stand up hosting (Workers
    Assets by default; a Worker script only if you actually need server-side
    behavior).
@@ -79,7 +86,10 @@ website-foundation/
    ```bash
    node scripts/verify-indexing.mjs https://your-deploy-url.example.com
    ```
-5. Walk the **Pre-launch checklist** at the bottom of `FOUNDATION.md` before
+5. Install the machinery from `templates/hooks/` and `templates/workflows/` so
+   the contracts are enforced by something other than memory. Both need a few
+   values filled in; the comments say which.
+6. Walk the **Pre-launch checklist** at the bottom of `FOUNDATION.md` before
    going live.
 
 ## What's inside
@@ -89,7 +99,11 @@ website-foundation/
 | [`FOUNDATION.md`](./FOUNDATION.md) | The contracts: URL/indexing, crawlability, per-page SEO, theme-token parity, pipeline health, enforcement machinery, a11y — **plus a pre-launch checklist.** |
 | [`CLOUDFLARE.md`](./CLOUDFLARE.md) | Cloudflare setup, Workers Assets by default with Pages as a supported alternative: stack choice, the contracts that bite on both (URL shape, additive `_headers`, one canonical host), config for each path, deploy verification. |
 | [`templates/astro.config.mjs`](./templates/astro.config.mjs) | Astro config with the load-bearing `trailingSlash: 'never'` + `build.format: 'file'` pairing. |
+| [`templates/wrangler.jsonc`](./templates/wrangler.jsonc) | Workers Assets config, with `not_found_handling` (the setting whose default silently kills your 404 page) explained and a verify command inline. |
+| [`templates/_headers`](./templates/_headers) | Security and cache baseline, documenting why a more specific rule does **not** override a broader one. |
 | [`templates/robots.txt`](./templates/robots.txt) | Allows crawl, points at the sitemap. |
+| [`templates/hooks/session-start.sh`](./templates/hooks/session-start.sh) | FOUNDATION §6 as a real hook: refuses to let a session start on a stale base, then verifies your regression markers still exist. |
+| [`templates/workflows/data-health.yml`](./templates/workflows/data-health.yml) | FOUNDATION §5 as a real workflow: asserts your synced data is fresh and **opens an issue** when it isn't, because the dangerous failure is a sync that goes green while doing nothing. |
 | [`scripts/verify-indexing.mjs`](./scripts/verify-indexing.mjs) | Zero-dependency Node script that fetches every sitemap URL and fails on any redirect / non-200 / canonical mismatch. **The check that catches the indexing bug before Google does.** |
 | [`prompts/seo-cross-optimize.md`](./prompts/seo-cross-optimize.md) | Paste-ready prompts + a settings checklist for earning *honest* SEO value (entity/authorship signals, one reciprocal dofollow link) — no link schemes, no keyword stuffing. |
 

@@ -163,12 +163,22 @@ If the site pulls from any cron/sync (RSS, API, scraped feed):
 
 ## 6. Enforcement machinery (so the above doesn't rot)
 
-- **SessionStart hook** that (a) confirms you're not on a stale base — fetch and
-  compare to the remote default branch before doing anything — and (b) verifies
-  invariant markers still exist, warning on drift.
+- **SessionStart hook** that (a) confirms you're not on a stale base, fetching
+  and comparing to the remote default branch before anything else, and (b)
+  verifies invariant markers still exist, warning on drift. Drop-in:
+  `templates/hooks/session-start.sh`.
 - **Regression registry** in `CLAUDE.md`: for each fix that took multiple tries
-  and is non-obvious, record `file · marker-to-grep · why-fragile (1 sentence) ·
-  verify-command`. This is per-repo, not portable — but the *pattern* is.
+  and is non-obvious, record one row. The entries are per-repo and do not
+  transfer; the columns do:
+
+  | # | Fix | Files / markers | Why fragile | Verify |
+  |---|-----|-----------------|-------------|--------|
+  | 1 | what the fix does, in a phrase | the specific string to grep, and where | one sentence on what a plausible refactor would break | a command whose output you can eyeball, or a visual check |
+
+  Write **why fragile** for someone who is about to delete the thing on purpose
+  because it looks redundant. That reader is the whole audience.
+- **Health monitor** for any automated data sync, separate from the sync
+  itself. Drop-in: `templates/workflows/data-health.yml` (§5).
 - **`verify-indexing.mjs` wired into CI** and run against every preview/prod
   deploy. It enforces contract §1 + §2 automatically.
 - **Workflow discipline:** Sync → Explore → Plan → Code → Commit. Sync before
