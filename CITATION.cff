@@ -2,9 +2,13 @@ cff-version: 1.2.0
 message: "If you use this foundation, please cite it."
 title: "website-foundation"
 abstract: >-
-  A portable, content-agnostic structural baseline for shipping new websites:
-  the URL/indexing contract, SEO invariants, Cloudflare deployment, and the
-  enforcement machinery that keeps them from rotting.
+  A portable, content-agnostic baseline for building and shipping a personal
+  website, especially with AI coding tools: a zero-to-deployed quickstart, a
+  guide to the design, voice and workflow decisions that make a site worth
+  visiting, the URL/indexing contract and SEO invariants, Cloudflare
+  deployment, and the enforcement machinery that keeps it all from rotting.
+version: "1.0.0"
+date-released: 2026-09-20
 type: software
 authors:
   - given-names: Brian
@@ -23,4 +27,5 @@ keywords:
   - static-site
   - web-performance
   - googlebot
+  - accessibility
   - web-development
