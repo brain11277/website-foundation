@@ -1,0 +1,34 @@
+/* Every color token in :root is redefined in both theme blocks. */
+@import url("nothing.css");
+
+:root {
+  --bg: #101018;
+  --text: #EDEDF2;
+  --accent-rgb: 139, 92, 246;
+  /* Not a color, so parity does not apply. */
+  --step-0: 1rem;
+  --shell: 1100px;
+}
+
+html[data-theme='light'] {
+  --bg: #FFFFFF;
+  --text: #16161A;
+  --accent-rgb: 109, 63, 214;
+}
+
+html[data-mode='reader'] {
+  --bg: #FFFFFF;
+  --text: #000000;
+  --accent-rgb: 0, 0, 204;
+}
+
+/* Scoped BY a theme, not a declaration OF one. Must not be treated as a
+   theme block, or every token reads as missing from it. */
+html[data-mode='reader'] a {
+  text-decoration: underline;
+}
+
+/* An attribute selector that is not a theme. */
+[tabindex]:not([tabindex="-1"]):focus-visible {
+  outline: 2px solid var(--accent);
+}

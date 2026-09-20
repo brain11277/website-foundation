@@ -37,7 +37,9 @@ jobs:
         with:
           node-version: 20
       - name: node --check
-        run: node --check scripts/verify-indexing.mjs
+        run: |
+          node --check scripts/verify-indexing.mjs
+          node --check scripts/verify-token-parity.mjs
       # A syntax check proves the file parses and nothing else. This runs the
       # verifier for real against local fixtures served from Node's built-in
       # http module: one site that should pass, one with a dangling JSON-LD

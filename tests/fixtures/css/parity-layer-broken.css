@@ -1,0 +1,19 @@
+/* Tokens declared inside @layer base, which is where Tailwind v4 and a lot of
+   modern CSS put them. @layer is cascade ordering, not a condition, so these
+   are unconditional and parity still applies.
+
+   --text is missing from the light theme. Before the parser descended into
+   @layer, this file reported "no :root custom properties" and exited 0, which
+   is a parser failure wearing a pass as a disguise. */
+@import url("nothing.css");
+
+@layer base {
+  :root {
+    --bg: #101018;
+    --text: #EDEDF2;
+  }
+
+  html[data-theme='light'] {
+    --bg: #FFFFFF;
+  }
+}

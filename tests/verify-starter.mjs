@@ -13,7 +13,7 @@
 // to satisfy out of the box.
 
 import { spawn } from 'node:child_process';
-import { readFile, access } from 'node:fs/promises';
+import { readFile, access, readdir } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { serveDir, originOf, runVerifier, indent } from './lib/serve.mjs';
@@ -128,47 +128,31 @@ check(!notFound.includes('application/ld+json'), '404.html emits no entity graph
 check(notFound.includes('noindex'), '404.html is noindex');
 
 // ── Token parity (FOUNDATION §4) ─────────────────────────────────────────────
-// Every color token in :root must be redefined in every theme block. This is
-// the contract that has no other enforcement anywhere.
-const css = await readFile(join(starter, 'src/styles/tokens.css'), 'utf8');
-const blockOf = (re) => {
-  const m = css.match(re);
-  return m ? new Set([...m[1].matchAll(/^\s*(--[\w-]+):/gm)].map((x) => x[1])) : null;
-};
-const isColor = (t) => !/^--(step|font|gutter|shell|measure)/.test(t);
-
-const root = blockOf(/:root\s*\{([\s\S]*?)\n\}/);
-const themes = [
-  ["html[data-theme='light']", blockOf(/html\[data-theme='light'\]\s*\{([\s\S]*?)\n\}/)],
-  ["html[data-mode='reader']", blockOf(/html\[data-mode='reader'\]\s*\{([\s\S]*?)\n\}/)],
-];
-
-if (!root) {
-  check(false, 'tokens.css: found a :root block');
-} else {
-  const rootColors = [...root].filter(isColor);
-  for (const [name, block] of themes) {
-    if (!block) {
-      check(false, `tokens.css: found ${name}`);
-      continue;
-    }
-    const missing = rootColors.filter((t) => !block.has(t));
-    check(missing.length === 0, `tokens.css: ${name} has parity`, `missing: ${missing.join(', ')}`);
-  }
-}
+// Delegated to the real checker rather than reimplemented here. Two
+// implementations of one contract is how they drift apart.
+const parity = await run(
+  process.execPath,
+  [join(here, '..', 'scripts', 'verify-token-parity.mjs'), join(starter, 'src/styles/tokens.css')],
+  starter,
+);
+check(parity.code === 0, 'starter tokens are in parity across every theme', parity.out);
 
 // ── The bundled checker has not drifted ──────────────────────────────────────
 // The starter ships its own copy of verify-indexing.mjs so that `npm run
 // verify` works for someone who pulled only the starter folder. Two copies of
 // a file is a sync obligation, and FOUNDATION §5 is explicit that an
 // unenforced one rots. So it is enforced: byte-identical or red.
-const canonical = await readFile(join(here, '..', 'scripts', 'verify-indexing.mjs'), 'utf8');
-const bundled = await readFile(join(starter, 'scripts', 'verify-indexing.mjs'), 'utf8');
-check(
-  canonical === bundled,
-  'starter/scripts/verify-indexing.mjs matches scripts/',
-  'The starter ships a copy for `npm run verify`. Re-copy it:\n  cp scripts/verify-indexing.mjs starter/scripts/',
-);
+for (const name of await readdir(join(starter, 'scripts'))) {
+  const canonical = await readFile(join(here, '..', 'scripts', name), 'utf8').catch(() => null);
+  const bundled = await readFile(join(starter, 'scripts', name), 'utf8');
+  check(
+    canonical === bundled,
+    `starter/scripts/${name} matches scripts/`,
+    canonical === null
+      ? `No scripts/${name} in this repo. A bundled script with no upstream cannot be kept in sync.`
+      : `The starter ships a copy so it works standalone. Re-copy it:\n  cp scripts/${name} starter/scripts/`,
+  );
+}
 
 // ── Nothing personal leaked in ───────────────────────────────────────────────
 const leaked = [];
