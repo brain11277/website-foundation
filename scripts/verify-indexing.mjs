@@ -8,7 +8,8 @@
 // asserts (failing CI red):
 //   1. status is 200 (not 3xx — the "Page with redirect" class)
 //   2. the <link rel="canonical"> self-references the fetched URL
-//   3. every JSON-LD @id the page REFERENCES is also DEFINED somewhere on it
+//   3. every JSON-LD @id the page REFERENCES resolves: defined on the page,
+//      or on the same-origin document its @id URL points at
 // and WARNS (non-fatal) on things that are usually, but not always, bugs:
 //   - a missing canonical tag
 //   - a <meta name="robots" content="noindex"> on a page that's in the sitemap
@@ -114,6 +115,36 @@ function collectSchemaIds(html) {
   return { defined, referenced: [...referenced.keys()] };
 }
 
+// Cache of documents already fetched while resolving cross-document @id
+// references, so a set referenced from ten pages costs one request.
+const docIdCache = new Map();
+
+/**
+ * Does `docUrl` define `id` in its own JSON-LD?
+ *
+ * An @id is a URI, not a same-page label. It is legitimate, and sometimes the
+ * only correct option, to reference a node defined on another page: a
+ * hand-authored page that cannot emit the site-wide entity graph still needs
+ * to say which set its term belongs to, and `inDefinedTermSet` has to
+ * reference by @id because a bare URL string there resolves to the wrong type.
+ *
+ * So a reference to another document is only dangling if that document really
+ * does not define it. Fetch and find out rather than assuming.
+ */
+async function documentDefines(docUrl, id) {
+  if (!docIdCache.has(docUrl)) {
+    let ids = new Set();
+    try {
+      const res = await fetch(docUrl, { redirect: 'follow' });
+      if (res.ok) ids = collectSchemaIds(await res.text()).defined;
+    } catch {
+      /* unreachable: treat as defining nothing */
+    }
+    docIdCache.set(docUrl, ids);
+  }
+  return docIdCache.get(docUrl).has(id);
+}
+
 // Set when any sitemap in the chain carries a <lastmod>. Freshness is a
 // quality signal rather than a correctness break, so a miss warns (FOUNDATION §2).
 let sawLastmod = false;
@@ -215,9 +246,36 @@ for (const url of urls) {
     failures++;
     continue;
   }
-  const dangling = referenced.filter((id) => !defined.has(id));
-  if (dangling.length) {
-    console.error(`FAIL  dangling @id    ${url}  referenced but never defined: ${dangling.join(', ')}`);
+  const unresolved = [];
+  for (const id of referenced.filter((i) => !defined.has(i))) {
+    // Which document is this @id claiming to live in?
+    let target;
+    try {
+      target = new URL(id, url);
+    } catch {
+      unresolved.push(id);
+      continue;
+    }
+    const targetDoc = `${target.origin}${target.pathname}`;
+    const thisDoc = (() => {
+      const u = new URL(url);
+      return `${u.origin}${u.pathname}`;
+    })();
+
+    // Same document, not defined here: this is the real bug class, a page
+    // referencing an entity nothing ever declares.
+    if (normalize(targetDoc) === normalize(thisDoc)) {
+      unresolved.push(id);
+      continue;
+    }
+    // Off-site: not ours to verify.
+    if (target.origin !== origin) continue;
+
+    if (!(await documentDefines(targetDoc, id))) unresolved.push(id);
+  }
+
+  if (unresolved.length) {
+    console.error(`FAIL  dangling @id    ${url}  referenced but never defined: ${unresolved.join(', ')}`);
     failures++;
     continue;
   }
