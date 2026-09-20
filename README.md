@@ -2,10 +2,11 @@
 
 # 🧱 website-foundation
 
-**The structural baseline for shipping a new website — so each one doesn't start from scratch.**
+**Build your own personal site, with everything the last three taught me already in it.**
 
-The content-agnostic lessons that transfer between sites: indexing correctness,
-SEO invariants, Cloudflare deployment, and the machinery to keep them enforced.
+A zero-to-deployed quickstart, the design and voice decisions that separate a
+site worth visiting from a generated one, and the structural contracts that keep
+it correct. Written to be handed straight to an AI coding tool.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![Dependencies](https://img.shields.io/badge/dependencies-none-brightgreen.svg)](./scripts/verify-indexing.mjs)
@@ -37,19 +38,47 @@ contracts — not as tribal memory.
 
 ## Contents
 
+- [Start here](#start-here)
 - [Repo layout](#repo-layout)
-- [Start a new site](#start-a-new-site)
 - [What's inside](#whats-inside)
-- [For a future AI session](#for-a-future-ai-session)
+- [Handing this to an AI tool](#handing-this-to-an-ai-tool)
 - [Keeping it clean — no secrets](#keeping-it-clean--no-secrets)
 - [Contributing](#contributing)
 - [About the author](#about-the-author)
+- [Using this](#using-this)
 - [License](#license)
+
+## Start here
+
+**Building a site?** Go to **[`QUICKSTART.md`](./QUICKSTART.md)** and come back
+when it is deployed. It is the shortest correct path from an empty directory to
+a live site on your domain, roughly 30 to 45 minutes.
+
+**Want it to be good, not just correct?** **[`BUILDING.md`](./BUILDING.md)** is
+the page set, the design token system, the voice guide, and the working loop.
+This is the part most personal sites skip, and it is why most of them are
+forgettable.
+
+**Hardening a site you already have?** Skip both. Read
+**[`FOUNDATION.md`](./FOUNDATION.md)**, run the checklist at the bottom, and
+point `verify-indexing.mjs` at production.
+
+```
+QUICKSTART.md  ->  nothing to a deployed site
+BUILDING.md    ->  deployed to worth visiting
+FOUNDATION.md  ->  the contracts, and why each one exists
+CLOUDFLARE.md  ->  the deployment specifics for both Cloudflare stacks
+```
+
+Everything here is MIT and meant to be copied. See
+[Using this](#using-this) if you want the short version of what that allows.
 
 ## Repo layout
 
 ```
 website-foundation/
+├── QUICKSTART.md              # nothing -> a deployed site on your domain
+├── BUILDING.md                # deployed -> worth visiting: pages, tokens, voice, loop
 ├── FOUNDATION.md              # structural contracts + pre-launch checklist
 ├── CLOUDFLARE.md              # Workers Assets / Pages setup, the contracts that bite on both
 ├── templates/
@@ -74,31 +103,12 @@ website-foundation/
 └── LICENSE                    # MIT
 ```
 
-## Start a new site
-
-1. Copy the contracts from **[`FOUNDATION.md`](./FOUNDATION.md)** into the new
-   repo's `CLAUDE.md` / `AGENTS.md`.
-2. Drop the **[`templates/`](./templates/)** files in and swap the domain:
-   `astro.config.mjs`, `robots.txt`, `_headers`, and `wrangler.jsonc` if you
-   are on Workers Assets.
-3. Follow **[`CLOUDFLARE.md`](./CLOUDFLARE.md)** to stand up hosting (Workers
-   Assets by default; a Worker script only if you actually need server-side
-   behavior).
-4. Add **[`scripts/verify-indexing.mjs`](./scripts/verify-indexing.mjs)** and run
-   it against a preview or production deploy in CI:
-   ```bash
-   node scripts/verify-indexing.mjs https://your-deploy-url.example.com
-   ```
-5. Install the machinery from `templates/hooks/` and `templates/workflows/` so
-   the contracts are enforced by something other than memory. Both need a few
-   values filled in; the comments say which.
-6. Walk the **Pre-launch checklist** at the bottom of `FOUNDATION.md` before
-   going live.
-
 ## What's inside
 
 | File | What it gives you |
 |---|---|
+| [`QUICKSTART.md`](./QUICKSTART.md) | The shortest correct path from an empty directory to a live site: scaffold, config, deploy, custom domain, verify. Includes the "where things go wrong" table for the six failures that account for most of them. |
+| [`BUILDING.md`](./BUILDING.md) | The part that decides whether anyone comes back: choosing a page set and cutting hard, building a design token system before the first screen, **writing a voice guide so your AI stops generating anonymous copy**, the Sync→Plan→Code loop, and what personality costs in accessibility terms. |
 | [`FOUNDATION.md`](./FOUNDATION.md) | The contracts: URL/indexing, crawlability, per-page SEO, theme-token parity, pipeline health, enforcement machinery, a11y — **plus a pre-launch checklist.** |
 | [`CLOUDFLARE.md`](./CLOUDFLARE.md) | Cloudflare setup, Workers Assets by default with Pages as a supported alternative: stack choice, the contracts that bite on both (URL shape, additive `_headers`, one canonical host), config for each path, deploy verification. |
 | [`templates/astro.config.mjs`](./templates/astro.config.mjs) | Astro config with the load-bearing `trailingSlash: 'never'` + `build.format: 'file'` pairing. |
@@ -111,21 +121,33 @@ website-foundation/
 | [`tests/run-fixtures.mjs`](./tests/run-fixtures.mjs) | Runs the verifier for real against local fixtures over Node's built-in http server, so the enforcement machinery is itself enforced. No network, no live site. |
 | [`prompts/seo-cross-optimize.md`](./prompts/seo-cross-optimize.md) | Paste-ready prompts + a settings checklist for earning *honest* SEO value (entity/authorship signals, one reciprocal dofollow link) — no link schemes, no keyword stuffing. |
 
-## For a future AI session
+## Handing this to an AI tool
 
-This repo is **public** specifically so any future coding session can pull the
-baseline in with zero setup — fetch the raw files directly, no repo scoping
-required:
+The repo is **public** precisely so a coding session can pull it in with zero
+setup. No cloning, no repo scoping, just fetch the raw files:
 
 ```
 https://raw.githubusercontent.com/brain11277/website-foundation/main/FOUNDATION.md
 https://raw.githubusercontent.com/brain11277/website-foundation/main/CLOUDFLARE.md
+https://raw.githubusercontent.com/brain11277/website-foundation/main/BUILDING.md
 ```
 
-> **Reusable kickoff prompt:**
+**Starting a new site:**
+
+> *"Read https://raw.githubusercontent.com/brain11277/website-foundation/main/QUICKSTART.md
+> and walk me through it for a site at `<my domain>`. Plan each step before you
+> run it, and stop at step 4 so we can do the design and voice work together."*
+
+**Hardening a site you already have:**
+
 > *"Read the structural baseline at
 > `https://raw.githubusercontent.com/brain11277/website-foundation/main/FOUNDATION.md`
-> and apply its contracts to this repo's CLAUDE.md and Cloudflare setup."*
+> and audit this repo against every contract in it. Report what fails before
+> changing anything."*
+
+Point your `CLAUDE.md` at the raw URL rather than pasting the contracts in, so
+you pick up fixes as they land. Paste them in only if you want a version frozen
+against a tag.
 
 ## Keeping it clean — no secrets
 
@@ -160,6 +182,32 @@ here are distilled from launching real sites and watching where they break —
 the kind of structural debugging he writes about at
 [brianrain.com](https://brianrain.com). For more on the thinking behind these
 practices, see his [writing on building in the open](https://brianrain.com/writing).
+
+## Using this
+
+Everything here is [MIT](./LICENSE), and the point of the repo is that you copy
+it. To be unambiguous about what that means in practice:
+
+- **Copy the templates and config snippets freely.** No attribution expected for
+  a `wrangler.jsonc`, a `_headers` file, or an Astro config. They are starting
+  points, not a library.
+- **Adapt the docs into your own `CLAUDE.md`.** That is the intended use, not a
+  grey area. Rewrite them in your own words, cut what does not apply.
+- **Build commercial things with it.** MIT, no restrictions, no notice needed on
+  your deployed site.
+- If you redistribute a substantial copy of the documentation itself, keep the
+  MIT notice with it. That is the one thing the license actually asks for.
+
+If the repo was useful and you want to say so, a link back or a
+[citation](./CITATION.cff) is appreciated and never required.
+
+## A site built this way
+
+[brianrain.com](https://brianrain.com) is the reference implementation. Every
+contract here was extracted from building and breaking it: the indexing
+incident in §1, the additive `_headers` bug, the fonts that silently fell back,
+the canvas that rasterized 97 MiB of sprites for a hidden element. If you want
+to see what the end of this path looks like, that is it.
 
 ## License
 

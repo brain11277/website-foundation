@@ -1,92 +1,110 @@
-# Prompt: make `website-foundation` an SEO asset for brianrain.com
+# Prompt: earn honest SEO for your name
 
-Two paste-ready prompts plus a phone-friendly settings checklist. The goal is
-**honest** SEO value — entity/brand authority, referral traffic, and one genuine
-dofollow link from brianrain.com — not link schemes or keyword stuffing
-(those get penalized and cheapen the repo).
+A paste-ready pair of prompts plus a settings checklist, for when you have a
+personal site **and** a public repo and want them to reinforce each other.
 
-Why this works: GitHub renders README links as `nofollow`, so the public repo's
-value to brianrain.com is (a) a credible engineering artifact that reinforces
-"Brian Rain" as an entity Google trusts on this topic, (b) referral clicks, and
-(c) the **reciprocal dofollow link from brianrain.com → repo**, which is the part
-that actually passes ranking signals.
+The goal is honest value: entity and brand authority, referral traffic, and one
+genuine link. Not link schemes, not keyword stuffing, not doorway pages. Those
+get penalized, and they make a repo worse for the humans who find it.
+
+**Why this works.** GitHub renders README links as `nofollow`, so a public repo
+does not pass ranking signal to your site directly. What it does give you is
+(a) a credible engineering artifact that reinforces your name as an entity
+search engines can trust on a topic, (b) referral clicks from people who found
+the repo, and (c) a reciprocal link **from your site to the repo**, which is the
+part that actually carries signal, plus the `sameAs` entity connection in your
+schema.
+
+No public repo? Skip to prompt 2 and use the schema half. The `sameAs` advice
+stands on its own.
 
 ---
 
-## Prompt 1 — run in the `website-foundation` repo
+## Prompt 1: run this in your public repo
+
+Replace `<REPO>`, `<YOUR SITE>`, `<YOUR NAME>` and `<YOUR ROLE>` before pasting.
 
 ```
-You are working in the public brain11277/website-foundation repo. Make it a
-genuine, non-spammy SEO asset for brianrain.com. Do NOT use link schemes,
-keyword stuffing, doorway content, or anything that reads unnaturally to a
-human — every change must improve the repo for a real reader first.
+You are working in the public repo <REPO>. Make it a genuine, non-spammy SEO
+asset for <YOUR SITE>. Do NOT use link schemes, keyword stuffing, doorway
+content, or anything that reads unnaturally to a human. Every change must
+improve the repo for a real reader first; if a change only makes sense to a
+crawler, do not make it.
 
 Tasks:
-1. README authorship / E-E-A-T signals:
-   - Add an "About the author" section near the bottom: Brian Rain, AI Product
-     & Partner Success Leader · Responsible AI, with a one-line bio and a natural
-     contextual link to https://brianrain.com (and /about, /writing where it
-     reads naturally). Use descriptive anchor text — never "click here", never
-     a wall of links. One or two links, placed where a reader would want them.
-   - Where the README references the "Page with redirect" indexing incident,
-     link it to a relevant brianrain.com writing piece if one exists (check the
-     site); otherwise link to https://brianrain.com/writing.
-2. Add a CITATION.cff at the repo root: title, author "Brian Rain", url
-   https://brianrain.com, repository-code the GitHub URL, and relevant keywords.
-   This gives the repo a machine-readable authorship/citation surface.
-3. Keep FOUNDATION.md content-agnostic — authorship/attribution belongs in
-   README + CITATION.cff, NOT woven into the doctrine.
-4. Verify: all links resolve, no broken anchors, README still reads cleanly.
-5. The repo description, topics, and homepage URL must be set in repo Settings
-   (web UI) — you cannot edit those from code, so OUTPUT the exact recommended
-   values for me to paste:
-   - Description (≤350 chars, keyword-honest, names Brian Rain + brianrain.com)
-   - Homepage URL: https://brianrain.com
-   - Topics: astro, cloudflare-workers, cloudflare-pages, technical-seo, seo,
-     static-site, indexing, sitemap, web-performance, web-development
+1. README authorship and E-E-A-T signals:
+   - Add an "About the author" section near the bottom: <YOUR NAME>, <YOUR
+     ROLE>, a one-line bio, and a natural contextual link to <YOUR SITE>. Use
+     descriptive anchor text, never "click here", never a wall of links. One or
+     two links, placed where a reader would actually want them.
+   - If the README describes a problem you have written about publicly, link
+     that mention to the specific piece. Confirm the page exists first; do not
+     invent URLs.
+2. Add a CITATION.cff at the repo root: title, author, url, repository-code,
+   license, version, date-released, and honest keywords. This gives the repo a
+   machine-readable authorship surface that tools and indexes can read.
+3. Keep the technical documentation content-agnostic. Authorship and
+   attribution belong in README and CITATION.cff, never woven into the
+   doctrine, where it reads as self-promotion and ages badly.
+4. Verify: every link resolves, no broken anchors, and the README still reads
+   cleanly top to bottom for someone who has never heard of me.
+5. Repo description, topics and homepage URL can only be set in repo Settings,
+   which you cannot edit from code. OUTPUT the exact recommended values for me
+   to paste:
+   - Description (<=350 chars, honest, names the stack and me)
+   - Homepage URL
+   - Topics (8 to 10, the ones someone would actually search)
 
-Commit on a branch and open a PR. Show me the diff before merging.
+Work on a branch and open a PR. Show me the diff before merging.
+```
+
+## Prompt 2: run this in your site repo
+
+```
+You are working in the repo for <YOUR SITE>. I want one tasteful, genuine link
+from the site to my public repo <REPO>, plus the entity signal in schema.
+
+Follow this repo's workflow: sync, explore, plan with no code, code only after
+I approve, then commit. Hold the SEO baseline, the voice guide, and any
+cross-page consistency rules already documented here.
+
+In plan mode, propose the single best home for ONE outbound link to the repo.
+Candidates: a "building in the open" mention on the About page, or a credit in
+the footer. Choose whichever reads naturally in my voice rather than as SEO
+bait. Make it a normal dofollow link; do not add rel="nofollow".
+
+Also add my profile URLs to the Person schema `sameAs` array: the code-hosting
+profile, and any publication or professional profile that is genuinely mine.
+`sameAs` is how a search engine connects separate accounts to one entity, so
+include only profiles I control and that are actually about me.
+
+Before committing, confirm the page still passes the SEO baseline: one h1,
+valid schema, title and description within their length windows.
 ```
 
 ---
 
-## Prompt 2 — run in the `brian-rain-website` repo (the reciprocal link)
+## Settings checklist
 
-```
-You are working in the brian-rain-website repo (brianrain.com). I want a single,
-tasteful, genuine link from the site to my public engineering repo
-https://github.com/brain11277/website-foundation, plus the entity signal in
-schema. This is the part that passes real SEO value, so do it carefully and to
-the letter of CLAUDE.md.
+The highest-leverage two minutes, and none of it needs a coding session. Do it
+in the GitHub web or mobile UI:
 
-Follow the repo workflow: Sync → Explore → Plan (plan mode, no code yet) →
-Code only after I approve → Commit. Hold the SEO baseline, the voice guide, the
-cross-page consistency rules, and the /ground-truth secrecy contract — do not
-touch /ground-truth.
+- [ ] **About → Description**: one honest line that names the stack and you.
+- [ ] **About → Website**: your site.
+- [ ] **About → Topics**: 8 to 10 real ones. For a site baseline, something like
+      `astro` `cloudflare-workers` `technical-seo` `seo` `static-site`
+      `indexing` `sitemap` `web-performance` `accessibility` `web-development`
+- [ ] **Settings → Code security → Push protection**: on.
+- [ ] Pin the repo to your profile, so it surfaces on the account your site's
+      schema `sameAs` points at.
+- [ ] Tag a release. A repo people copy from should let them say which version
+      they copied.
 
-Propose (in plan mode) the best home for ONE outbound link to the repo —
-candidates: a "building in the open" mention on /about, or a credit in the
-footer — chosen to read naturally in Brian's voice, not as SEO bait. Make it a
-normal dofollow link (no rel="nofollow").
+## What not to do
 
-Also: add the GitHub profile (https://github.com/brain11277) to the Person
-schema `sameAs` array in src/utils/seo.ts if it's not already there — that's a
-legitimate entity signal linking the brand to the verified engineering account.
-
-Before committing, run the voice-copy-reviewer on any new prose and the
-design-system-auditor if any styling changed. Confirm the page still passes the
-SEO baseline (one h1, schema valid, title/description lengths).
-```
-
----
-
-## Phone-friendly settings checklist (no session needed)
-
-Do these in the GitHub web/mobile UI after publishing — they're the
-highest-leverage discoverability levers and take two minutes:
-
-- [ ] **About → Description**: a one-line, honest summary that names the stack and Brian Rain.
-- [ ] **About → Website**: `https://brianrain.com`
-- [ ] **About → Topics**: `astro` `cloudflare-workers` `cloudflare-pages` `technical-seo` `seo` `static-site` `indexing` `sitemap` `web-performance` `web-development`
-- [ ] **Settings → Code security → Push protection**: on (the secret backstop).
-- [ ] Pin the repo to your GitHub profile so it surfaces on the profile that brianrain.com's schema `sameAs` will point to.
+- Do not add links to your site from unrelated repos, or from issue and PR
+  comments. That is a link scheme and it is detectable.
+- Do not put keyword lists in your README, your alt text, or your schema.
+- Do not claim credentials, awards or affiliations you do not have. Structured
+  data that contradicts reality is the fastest way to lose trust signals, and it
+  is the one mistake that is genuinely hard to walk back.
