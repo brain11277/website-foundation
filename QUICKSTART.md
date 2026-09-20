@@ -134,8 +134,11 @@ Turn on **SSL/TLS → Always Use HTTPS**.
 ## 8. Verify before you tell anyone
 
 ```bash
-node scripts/verify-indexing.mjs https://example.com
+npm run verify -- https://example.com
 ```
+
+The starter bundles the checker so this works from your own project, with no
+dependency and nothing to install.
 
 Every sitemap URL must be `200`, not a redirect, with a self-referencing
 canonical and no dangling JSON-LD `@id`. This is the check that catches the
@@ -147,7 +150,9 @@ Nothing gets indexed if nobody knows it exists.
 
 ## 9. Install the machinery
 
-So the contracts survive contact with your future self:
+So the contracts survive contact with your future self. These two live in
+this repo rather than in the starter, because whether you want either depends
+on how you work. Copy them from `templates/`:
 
 - `templates/hooks/session-start.sh` to `.claude/hooks/`, and register it as a
   SessionStart hook. It stops an AI session from designing against a stale base,

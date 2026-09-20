@@ -157,6 +157,19 @@ if (!root) {
   }
 }
 
+// ── The bundled checker has not drifted ──────────────────────────────────────
+// The starter ships its own copy of verify-indexing.mjs so that `npm run
+// verify` works for someone who pulled only the starter folder. Two copies of
+// a file is a sync obligation, and FOUNDATION §5 is explicit that an
+// unenforced one rots. So it is enforced: byte-identical or red.
+const canonical = await readFile(join(here, '..', 'scripts', 'verify-indexing.mjs'), 'utf8');
+const bundled = await readFile(join(starter, 'scripts', 'verify-indexing.mjs'), 'utf8');
+check(
+  canonical === bundled,
+  'starter/scripts/verify-indexing.mjs matches scripts/',
+  'The starter ships a copy for `npm run verify`. Re-copy it:\n  cp scripts/verify-indexing.mjs starter/scripts/',
+);
+
 // ── Nothing personal leaked in ───────────────────────────────────────────────
 const leaked = [];
 for (const p of [...pages, '404.html']) {

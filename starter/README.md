@@ -54,7 +54,7 @@ Then verify rather than trusting it:
 curl -s -o /dev/null -w '%{http_code} %{size_download}\n' https://yoursite/nope
 
 # Every sitemap URL 200, canonical self-referencing, no dangling @id.
-node path/to/website-foundation/scripts/verify-indexing.mjs https://yoursite
+npm run verify -- https://yoursite
 ```
 
 ## Fonts
@@ -83,4 +83,7 @@ src/
 │   └── base.css          reset + a11y boilerplate
 ├── data/types.ts         shapes for structured content
 └── pages/                index, about, contact, 404
+
+scripts/verify-indexing.mjs   the indexing checker, bundled so
+                              `npm run verify` needs nothing installed
 ```
