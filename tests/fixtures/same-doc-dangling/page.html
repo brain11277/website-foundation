@@ -1,0 +1,8 @@
+<!DOCTYPE html><html lang="en"><head>
+<title>A page referencing an entity it never declares</title>
+<meta name="description" content="The original bug class: mainEntity points at a person node on this very document, and nothing on this document ever defines it.">
+<link rel="canonical" href="__ORIGIN__/page">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"ProfilePage","mainEntity":{"@id":"__ORIGIN__/page#person"}}
+</script>
+</head><body><h1>Dangling</h1></body></html>

@@ -96,8 +96,15 @@ content. Five layers each looked correct but disagreed on the URL shape:
   `mainEntity: {"@id": ".../#person"}` while defining `#person` nowhere, and a
   crawler following the reference finds nothing. Emit the shared entities
   (Person, WebSite) from **one head component on every indexable page**, so a
-  reference is never orphaned by which page it appears on. `verify-indexing.mjs`
-  checks this.
+  reference is never orphaned by which page it appears on.
+  An `@id` is a URI, not a same-page label, so referencing a node defined on
+  another page of the site is legitimate and sometimes the only option: a
+  hand-authored page outside your template pipeline still has to declare which
+  set its term belongs to, and `inDefinedTermSet` must reference by `@id`
+  because a bare URL string there resolves to the wrong type.
+  `verify-indexing.mjs` checks both cases: it fails on a reference to this same
+  document that nothing defines, and it resolves a cross-document reference by
+  fetching the page its `@id` points at.
 - **Don't cap structured data at an arbitrary slice.** A list schema built from
   the first 50 of 63 items leaves 13 with no structured data and no error.
 - **Republished work: `url` is the page you are on**, and the original elsewhere

@@ -35,7 +35,13 @@ async function check(dir, expected, label) {
 
 const results = [
   await check('good', 0, 'a correct site passes'),
-  await check('bad', 1, 'a dangling JSON-LD @id fails the build'),
+  await check('bad', 1, 'an @id pointing at a document that does not exist fails'),
+  // An @id is a URI, not a same-page label. Referencing a node defined on
+  // another page of the same site is legitimate and sometimes the only
+  // correct option, so the checker resolves it rather than assuming the worst.
+  await check('cross-doc-ok', 0, 'an @id resolved on another page of the site passes'),
+  // The original bug class, and the one that must stay a hard failure.
+  await check('same-doc-dangling', 1, 'an @id referencing this same page, undefined, fails'),
 ];
 
 if (results.every(Boolean)) {
