@@ -6,8 +6,10 @@ It is deliberately plain. The structure, the accessibility and the indexing are
 handled; the taste is the part you bring. See `BUILDING.md` in
 website-foundation for how to decide the rest.
 
+**Requires Node 22.12 or newer**, which is Astro 7's floor. On an older Node
+the install succeeds and the build fails with an unsupported-version error.
+
 ```bash
-cp -R starter my-site && cd my-site
 npm install
 npm run dev
 ```
@@ -85,7 +87,7 @@ src/
 │   ├── formatDate.ts     UTC-pinned, and that pin matters
 │   └── contrast.ts       WCAG ratio math
 ├── styles/
-│   ├── tokens.css        every color, three theme blocks
+│   ├── tokens.css        every color: a base plus two themes
 │   └── base.css          reset + a11y boilerplate
 ├── data/types.ts         shapes for structured content
 └── pages/                index, about, contact, 404

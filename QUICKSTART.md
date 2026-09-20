@@ -152,7 +152,14 @@ Nothing gets indexed if nobody knows it exists.
 
 So the contracts survive contact with your future self. These two live in
 this repo rather than in the starter, because whether you want either depends
-on how you work. Copy them from `templates/`:
+on how you work. If you pulled only the starter, fetch them directly:
+
+```bash
+mkdir -p .claude/hooks .github/workflows
+curl -o .claude/hooks/session-start.sh \
+  https://raw.githubusercontent.com/brain11277/website-foundation/main/templates/hooks/session-start.sh
+chmod +x .claude/hooks/session-start.sh
+```
 
 - `templates/hooks/session-start.sh` to `.claude/hooks/`, and register it as a
   SessionStart hook. It stops an AI session from designing against a stale base,

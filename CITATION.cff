@@ -3,11 +3,12 @@ message: "If you use this foundation, please cite it."
 title: "website-foundation"
 abstract: >-
   A portable, content-agnostic baseline for building and shipping a personal
-  website, especially with AI coding tools: a zero-to-deployed quickstart, a
-  guide to the design, voice and workflow decisions that make a site worth
-  visiting, the URL/indexing contract and SEO invariants, Cloudflare
-  deployment, and the enforcement machinery that keeps it all from rotting.
-version: "1.0.0"
+  website, especially with AI coding tools: a working starter site, a
+  zero-to-deployed quickstart, a guide to the design, voice and workflow
+  decisions that make a site worth visiting, the URL/indexing contract and SEO
+  invariants, Cloudflare deployment, and zero-dependency checkers that enforce
+  the contracts in CI.
+version: "1.1.0"
 date-released: 2026-09-20
 type: software
 authors:

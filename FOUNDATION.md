@@ -4,11 +4,24 @@ Portable, **content-agnostic** contracts that every website has to satisfy, no
 matter what's on it. These are the lessons that transfer between repos — the
 ones you otherwise re-derive by hitting the same bug on each new site.
 
-**How to use this:** at the start of a new site, copy the contracts below into
-the new repo's `CLAUDE.md` (or `AGENTS.md`). Run the **Pre-launch checklist** at
-the bottom before going live. Wire `scripts/verify-indexing.mjs` into CI so the
-indexing contract is enforced by a machine, not by a Search Console alert weeks
-later.
+**How to use this:** point your repo's `CLAUDE.md` (or `AGENTS.md`) at the raw
+URL of this file, rather than pasting it in, so you pick up corrections as they
+land. Paste it only when you want a copy frozen against a release tag.
+
+```
+https://raw.githubusercontent.com/brain11277/website-foundation/main/FOUNDATION.md
+```
+
+Run the **Pre-launch checklist** at the bottom before going live, and wire both
+checkers into CI so these contracts are enforced by a machine rather than by a
+Search Console alert weeks later:
+
+- `scripts/verify-indexing.mjs` for §1, §2 and the §3 entity graph
+- `scripts/verify-token-parity.mjs` for §4
+
+**Starting from scratch?** The same repo ships a `starter/`, a working site with
+all of this already satisfied, and a `QUICKSTART.md` that goes from nothing to
+a deployed domain. This file is the doctrine; that is the shortcut.
 
 > The thing that does **not** transfer between repos is a regression registry —
 > those entries are welded to specific files and line numbers. What transfers is
