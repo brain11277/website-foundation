@@ -89,6 +89,7 @@ website-foundation/
 │   ├── wrangler.jsonc         # Workers Assets config, incl. the not_found_handling trap
 │   ├── _headers               # security + cache baseline; why the rules are additive
 │   ├── robots.txt             # allow crawl + point to sitemap
+│   ├── _redirects             # one canonical host; 301 the other
 │   ├── hooks/
 │   │   └── session-start.sh   # stale-base check + regression-marker verification (§6)
 │   └── workflows/
@@ -97,12 +98,14 @@ website-foundation/
 │   ├── verify-indexing.mjs    # zero-dep CI check: redirects, canonical, JSON-LD @id graph
 │   └── verify-token-parity.mjs # zero-dep CI check: every color token themed (§4)
 ├── tests/
-│   ├── run-fixtures.mjs       # runs the verifier against local fixtures; no network
-│   └── fixtures/              # one site that must pass, one that must fail
+│   ├── run-fixtures.mjs       # runs both checkers against local fixtures; no network
+│   ├── verify-starter.mjs     # builds the starter and asserts the contracts it claims
+│   ├── lib/serve.mjs          # static server that resolves paths the way the host does
+│   └── fixtures/              # sites and stylesheets that must pass, and must fail
 ├── prompts/
 │   └── seo-cross-optimize.md  # paste-ready prompts for honest E-E-A-T / authorship signals
 ├── .github/workflows/
-│   └── ci.yml                 # gitleaks secret scan + the verifier's own fixture suite
+│   └── ci.yml                 # gitleaks, the fixture suite, and a real starter build
 ├── .gitignore                 # blocks env files, keys, secrets
 └── LICENSE                    # MIT
 ```
@@ -120,10 +123,12 @@ website-foundation/
 | [`templates/wrangler.jsonc`](./templates/wrangler.jsonc) | Workers Assets config, with `not_found_handling` (the setting whose default silently kills your 404 page) explained and a verify command inline. |
 | [`templates/_headers`](./templates/_headers) | Security and cache baseline, documenting why a more specific rule does **not** override a broader one. |
 | [`templates/robots.txt`](./templates/robots.txt) | Allows crawl, points at the sitemap. |
+| [`templates/_redirects`](./templates/_redirects) | Picks one canonical host and 301s the other, because mixed hosts split your ranking signal. |
 | [`templates/hooks/session-start.sh`](./templates/hooks/session-start.sh) | FOUNDATION §6 as a real hook: refuses to let a session start on a stale base, then verifies your regression markers still exist. |
 | [`templates/workflows/data-health.yml`](./templates/workflows/data-health.yml) | FOUNDATION §5 as a real workflow: asserts your synced data is fresh and **opens an issue** when it isn't, because the dangerous failure is a sync that goes green while doing nothing. |
 | [`scripts/verify-indexing.mjs`](./scripts/verify-indexing.mjs) | Zero-dependency Node script that fetches every sitemap URL and fails on any redirect, non-200, canonical mismatch, or **unresolved JSON-LD `@id`**. Warns on missing `lastmod`, stray `noindex`, `<h1>` count, and title/description length. **The check that catches the indexing bug before Google does.** |
 | [`scripts/verify-token-parity.mjs`](./scripts/verify-token-parity.mjs) | Zero-dependency checker for §4: every color token in `:root` must be redefined in every theme block. Knows that a bare `139, 92, 246` channel triplet is a color, which is the token people forget. |
+| [`tests/verify-starter.mjs`](./tests/verify-starter.mjs) | Builds the starter and asserts what it claims: the indexing contract, a 404 with a real body, one `<h1>` per page, a resolving entity graph, token parity, and no personal identifier in the output. |
 | [`tests/run-fixtures.mjs`](./tests/run-fixtures.mjs) | Runs the verifier for real against local fixtures over Node's built-in http server, so the enforcement machinery is itself enforced. No network, no live site. |
 | [`prompts/seo-cross-optimize.md`](./prompts/seo-cross-optimize.md) | Paste-ready prompts + a settings checklist for earning *honest* SEO value (entity/authorship signals, one reciprocal dofollow link) — no link schemes, no keyword stuffing. |
 

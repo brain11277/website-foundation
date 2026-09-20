@@ -185,7 +185,8 @@ Before you call it:
 - Read every page aloud. Anything you would not say out loud, rewrite.
 - Show one person who does not know what you do and ask what they think you do.
 - Run the `FOUNDATION.md` pre-launch checklist.
-- Run `verify-indexing.mjs` against production.
+- Run `verify-indexing.mjs` against production, and `verify-token-parity.mjs`
+  against your token stylesheet.
 - Tab through every page. Turn on reduced motion. Check it on a phone.
 
 Then stop, and ship it. The version that exists beats the version you are still
