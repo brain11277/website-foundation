@@ -53,7 +53,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # Astro 7 requires >=22.12. The verify-script job deliberately stays
+          # on 20 to keep proving the zero-dependency checker runs on older
+          # Node; this job has to match what the starter actually needs.
+          node-version: 22
           cache: npm
           cache-dependency-path: starter/package-lock.json
       # The starter is a real Astro site, so it can be broken by a release of

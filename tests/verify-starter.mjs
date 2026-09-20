@@ -50,14 +50,18 @@ if (process.argv.includes('--build')) {
   const build = await run('npm', ['run', 'build'], starter);
   check(build.code === 0, 'starter builds', build.out);
 
-  // A build that emits warnings still "works", but deprecation warnings are
-  // how a config rots quietly across major versions. Surface them.
-  const warned = /\[WARN\]|deprecat/i.test(build.out);
-  check(!warned, 'starter builds without warnings', warned ? build.out : '');
+  // Bail immediately on a failed build. Everything below asserts things about
+  // output that does not exist, and reporting "builds without warnings" for a
+  // build that did not happen is worse than reporting nothing.
   if (build.code !== 0) {
     console.error('\nstarter verification red.');
     process.exit(1);
   }
+
+  // A build that emits warnings still "works", but deprecation warnings are
+  // how a config rots quietly across major versions. Surface them.
+  const warned = /\[WARN\]|deprecat/i.test(build.out);
+  check(!warned, 'starter builds without warnings', warned ? build.out : '');
 }
 
 try {

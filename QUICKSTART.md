@@ -6,7 +6,7 @@ your own domain. Roughly 30 to 45 minutes, most of it waiting on DNS.
 This gets you a site that is **structurally correct**. What makes it worth
 visiting is [`BUILDING.md`](./BUILDING.md). Do this first, then go there.
 
-**You need:** Node 20+, a Cloudflare account (free), git, and an AI coding tool
+**You need:** Node 22.12+ (what Astro 7 requires), a Cloudflare account (free), git, and an AI coding tool
 if you want one. A domain is optional until step 7.
 
 *The starter is built and checked against these contracts on every commit to
@@ -14,13 +14,23 @@ this repo, so this page cannot quietly go stale.*
 
 ---
 
-## 1. Copy the starter
+## 1. Get the starter
+
+Pull just the starter folder, with no git history attached to it:
 
 ```bash
-cp -R starter my-site
+npx degit brain11277/website-foundation/starter my-site
 cd my-site
 npm install
 npm run dev
+```
+
+Or clone the whole repo and copy it out, if you want the docs locally too:
+
+```bash
+git clone https://github.com/brain11277/website-foundation.git
+cp -R website-foundation/starter my-site
+cd my-site && npm install && npm run dev
 ```
 
 That is a complete, working site: correct URL shape, a resolving structured
