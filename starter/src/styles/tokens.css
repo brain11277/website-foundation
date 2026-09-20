@@ -1,0 +1,184 @@
+/* tokens.css
+ *
+ * Every color and every repeating size, defined once. This file is the single
+ * source of truth for the look of the site.
+ *
+ * ── THE PARITY CONTRACT (FOUNDATION.md §4) ───────────────────────────────
+ * Every color token declared in :root MUST be redeclared in every theme block
+ * below. A token with no override is silently the wrong color in that theme,
+ * and you will find it by eye, on a page you were not looking at, weeks later.
+ *
+ * This holds even when the value is irrelevant in that theme. Declare it
+ * anyway, with a comment saying why. Parity you can check mechanically beats
+ * parity you have to reason about, and a future edit cannot slip a
+ * partially-themed component through a list that is always complete.
+ *
+ * The three blocks are deliberately identical in shape and order. Read them
+ * side by side; any asymmetry is a bug.
+ *
+ * Every text/surface pair below was measured, not eyeballed, against the
+ * lightest surface it can land on. Worst cases, all clearing the 4.5:1 AA
+ * floor for body text:
+ *
+ *   dark   --text-dim  on --card   4.81:1
+ *   dark   --on-accent on --accent-strong   6.30:1
+ *   light  --text-dim  on --card   4.86:1
+ *   light  --accent (links) on --card   6.30:1
+ *
+ * Both --text-dim values started a shade quieter and failed at 3.83 and 4.35.
+ * That band, just under the threshold, is exactly where eyeballing passes and
+ * measuring does not. Re-measure if you change a single one of these.
+ */
+
+:root {
+  /* ── Surfaces ───────────────────────────────────────────────────────── */
+  --bg: #12121A;
+  --surface: #1A1A24;
+  --card: #22222E;
+  --border: #2E2E3C;
+
+  /* ── Text ────────────────────────────────────────────────────────────
+   * Four steps, loudest to quietest. --text-muted is the one that gets
+   * people: it must clear 4.5:1 against the LIGHTEST surface it ever lands
+   * on, which is --card, not --bg. Check it there.
+   */
+  --text-hi: #F2F1F6;
+  --text-body: #D6D4E0;
+  --text-muted: #A5A2B5;
+  --text-dim: #8F8CA1;
+
+  /* ── Accent ──────────────────────────────────────────────────────────
+   * Two accents, deliberately. --accent is for decorative use: glows,
+   * gradients, borders, selection. --accent-strong is the only one allowed
+   * behind --on-accent text, because a decorative accent that looks right
+   * rarely clears 4.5:1. Splitting them is what stops "make the button the
+   * brand color" from quietly shipping a contrast failure.
+   */
+  --accent: #8B5CF6;
+  --accent-strong: #6D3FD6;
+  --on-accent: #FFFFFF;
+  --focus-ring: #A78BFA;
+
+  /* ── Semantic ───────────────────────────────────────────────────────── */
+  --ok: #4ADE80;
+  --warn: #FBBF24;
+  --err: #F87171;
+
+  /* ── RGB channel triplets ────────────────────────────────────────────
+   * Comma-separated channels, so you can compose rgba(var(--accent-rgb),
+   * 0.15) at any alpha. Without these you end up hardcoding the brand hex
+   * inside a gradient, which is invisible to every theme override.
+   * Keep in sync with the hex tokens above.
+   */
+  --accent-rgb: 139, 92, 246;
+  --bg-rgb: 18, 18, 26;
+  --card-rgb: 34, 34, 46;
+
+  /* ── Type ────────────────────────────────────────────────────────────
+   * A modular scale. Pick sizes from here, never ad hoc.
+   */
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --step--1: 0.833rem;
+  --step-0: 1rem;
+  --step-1: 1.2rem;
+  --step-2: 1.44rem;
+  --step-3: 1.728rem;
+  --step-4: 2.074rem;
+
+  /* ── Space and measure ──────────────────────────────────────────────── */
+  --gutter: 16px;
+  --shell: 1100px;
+  --measure: 65ch;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+ * THEME: light
+ * Set via <html data-theme="light">. The layout restores this before first
+ * paint so there is no flash.
+ *
+ * Same tokens, same order, no omissions.
+ * ───────────────────────────────────────────────────────────────────────── */
+html[data-theme='light'] {
+  --bg: #FBFAF8;
+  --surface: #F2F0EC;
+  --card: #FFFFFF;
+  --border: #DEDAD2;
+
+  --text-hi: #14131A;
+  --text-body: #2E2C38;
+  --text-muted: #5A576B;
+  --text-dim: #726F84;
+
+  /* Verified against --card (#FFFFFF), the lightest surface here. */
+  --accent: #6D3FD6;
+  --accent-strong: #5B2FC2;
+  --on-accent: #FFFFFF;
+  --focus-ring: #6D3FD6;
+
+  --ok: #15803D;
+  --warn: #A16207;
+  --err: #B91C1C;
+
+  --accent-rgb: 109, 63, 214;
+  --bg-rgb: 251, 250, 248;
+  --card-rgb: 255, 255, 255;
+
+  /* Type and space tokens are theme-independent and are not redeclared. The
+     parity rule is about COLOR: a size does not change meaning per theme. */
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+ * MODE: reader
+ * Set via <html data-mode="reader">. A genuinely high-contrast, low-noise
+ * reading mode, not the default with the animation paused.
+ *
+ * Mode is independent of theme, so this block wins where they overlap by
+ * appearing later in the file.
+ * ───────────────────────────────────────────────────────────────────────── */
+html[data-mode='reader'] {
+  --bg: #FFFFFF;
+  --surface: #FFFFFF;
+  --card: #FFFFFF;
+  --border: #000000;
+
+  --text-hi: #000000;
+  --text-body: #000000;
+  --text-muted: #1A1A1A;
+  --text-dim: #333333;
+
+  --accent: #0000CC;
+  --accent-strong: #0000AA;
+  --on-accent: #FFFFFF;
+  --focus-ring: #0000CC;
+
+  --ok: #006400;
+  --warn: #7A4E00;
+  --err: #A00000;
+
+  --accent-rgb: 0, 0, 204;
+  --bg-rgb: 255, 255, 255;
+  --card-rgb: 255, 255, 255;
+
+  /* Reader mode strips decoration site-wide. !important is appropriate here
+     and nowhere else: it has to beat component styles it cannot know about. */
+  --measure: 70ch;
+}
+
+html[data-mode='reader'] *,
+html[data-mode='reader'] *::before,
+html[data-mode='reader'] *::after {
+  animation: none !important;
+  transition: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  backdrop-filter: none !important;
+  filter: none !important;
+}
+
+/* Links must be identifiable without relying on color (WCAG 1.4.1). */
+html[data-mode='reader'] a:not(.skip-link) {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

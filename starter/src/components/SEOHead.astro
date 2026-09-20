@@ -1,0 +1,84 @@
+---
+import { site } from '../site.config';
+import { buildSEOMeta, personSchema, websiteSchema, termsSchema } from '../utils/seo';
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+  ogType?: 'website' | 'article';
+  /** Page-specific JSON-LD, e.g. profilePageSchema(). */
+  schema?: object | object[];
+  /** Skip the ` | suffix` on the title. */
+  noSuffix?: boolean;
+  noIndex?: boolean;
+}
+
+const { title, description, ogImage, ogType, schema, noSuffix, noIndex } = Astro.props;
+
+const meta = buildSEOMeta({
+  title,
+  description,
+  ogImage,
+  ogType,
+  noSuffix,
+  pathname: Astro.url.pathname,
+});
+
+const pageSchema = schema ? (Array.isArray(schema) ? schema : [schema]) : [];
+
+// ── This is the dangling-reference fix. Do not "optimize" it. ────────────────
+//
+// Person and WebSite are emitted on EVERY indexable page, not just the
+// homepage or the about page. Page schemas below reference #person and
+// #website by @id, and a reference whose target is not defined on the SAME
+// page resolves to nothing when a crawler follows it.
+//
+// Emitting the definers only where they feel natural is the intuitive choice
+// and it is the bug: you get an about page that defines #person and five other
+// pages that reference it into the void, with no error anywhere.
+//
+// noIndex pages are the one exception. There is no value in seeding an entity
+// graph from a page we are asking crawlers to ignore.
+const schemaArr = noIndex
+  ? pageSchema
+  : [personSchema(), websiteSchema({ description }), termsSchema(), ...pageSchema].filter(Boolean);
+---
+<title>{meta.title}</title>
+<meta name="description" content={meta.description} />
+<link rel="canonical" href={meta.canonicalUrl} />
+{noIndex
+  ? <meta name="robots" content="noindex, nofollow" />
+  /* max-image-preview:large opts the social card into large thumbnails in
+     Search and Discover. Without it Google defaults to a small one or none. */
+  : <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />}
+<meta name="author" content={site.author.name} />
+
+<meta property="og:title" content={meta.title} />
+<meta property="og:description" content={meta.description} />
+<meta property="og:url" content={meta.canonicalUrl} />
+<meta property="og:type" content={meta.ogType} />
+<meta property="og:locale" content={site.ogLocale} />
+<meta property="og:image" content={meta.ogImage} />
+{/* Dimensions let a crawler lay out the card before the image finishes
+    downloading; alt is read by screen readers on platforms that surface it. */}
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content={meta.title} />
+<meta property="og:site_name" content={site.name} />
+
+{site.twitter && (
+  <>
+    <meta name="twitter:card" content={meta.twitterCard} />
+    <meta name="twitter:site" content={meta.twitterHandle} />
+    <meta name="twitter:creator" content={meta.twitterHandle} />
+    <meta name="twitter:title" content={meta.title} />
+    <meta name="twitter:description" content={meta.description} />
+    <meta name="twitter:image" content={meta.ogImage} />
+    <meta name="twitter:image:alt" content={meta.title} />
+  </>
+)}
+
+{schemaArr.map((s) => (
+  <script type="application/ld+json" set:html={JSON.stringify(s)} />
+))}

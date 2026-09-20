@@ -1,0 +1,269 @@
+---
+import { site } from '../site.config';
+
+interface Props {
+  active?: string;
+}
+const { active } = Astro.props;
+const links = site.nav;
+---
+<header role="banner">
+  <div class="shell bar">
+    <a href="/" class="brand" aria-label={`${site.name}, home`}>{site.name}</a>
+
+    <nav class="desktop-nav" aria-label="Primary">
+      {links.map((l) => (
+        <a
+          href={l.href}
+          class="nav-link"
+          aria-current={active === l.key ? 'page' : undefined}
+        >
+          {l.label}
+        </a>
+      ))}
+    </nav>
+
+    <div class="controls">
+      {/*
+        Both toggles carry their icon, visible label and aria-label for BOTH
+        states as data attributes, and the script swaps all three together from
+        the dataset.
+
+        This is what keeps WCAG 2.5.3 (label in name) satisfied across a state
+        flip: the accessible name must CONTAIN the visible text, so if the
+        visible label changes and the aria-label does not, voice control can no
+        longer address the control. Keeping the strings out of the JS means
+        they cannot drift apart.
+      */}
+      <button
+        type="button"
+        class="toggle"
+        data-theme-toggle
+        aria-pressed="false"
+        data-label-off="Dark"
+        data-label-on="Light"
+        data-aria-off="Dark theme, switch to light"
+        data-aria-on="Light theme, switch to dark"
+        aria-label="Dark theme, switch to light"
+      >
+        <span data-label>Dark</span>
+      </button>
+
+      <button
+        type="button"
+        class="toggle"
+        data-mode-toggle
+        aria-pressed="false"
+        data-label-off="Full"
+        data-label-on="Reader"
+        data-aria-off="Full mode, switch to reader"
+        data-aria-on="Reader mode, switch to full"
+        aria-label="Full mode, switch to reader"
+      >
+        <span data-label>Full</span>
+      </button>
+
+      {/*
+        aria-controls points at the id of the element this button shows and
+        hides, and aria-expanded must be kept in step with the actual state.
+        A hamburger with neither is a button that announces nothing about what
+        it does or whether it worked.
+      */}
+      <button
+        type="button"
+        class="menu-btn"
+        data-menu-btn
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        aria-label="Menu"
+      >
+        Menu
+      </button>
+    </div>
+  </div>
+
+  <nav id="mobile-menu" class="mobile-nav" aria-label="Primary" hidden>
+    {links.map((l) => (
+      <a
+        href={l.href}
+        class="nav-link"
+        aria-current={active === l.key ? 'page' : undefined}
+      >
+        {l.label}
+      </a>
+    ))}
+  </nav>
+</header>
+
+<script>
+  // Preferences live in one JSON blob under one key, rather than a key per
+  // setting. It keeps the pre-paint read in BaseLayout to a single
+  // localStorage hit, and leaves room to add settings later without touching
+  // that script again.
+  const KEY = 'site.prefs';
+
+  type Prefs = { theme?: string; mode?: string };
+
+  const read = (): Prefs => {
+    try {
+      return JSON.parse(localStorage.getItem(KEY) || '{}');
+    } catch {
+      return {};
+    }
+  };
+
+  const write = (p: Prefs) => {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(p));
+    } catch {
+      /* private mode, blocked storage: the toggle still works for this page */
+    }
+    // Anything else on the page that cares about theme can listen for this
+    // rather than polling the attribute.
+    window.dispatchEvent(new CustomEvent('site:prefs:change', { detail: p }));
+  };
+
+  function sync(btn: HTMLElement, on: boolean) {
+    const label = btn.querySelector('[data-label]');
+    const d = btn.dataset;
+    if (label) label.textContent = on ? d.labelOn! : d.labelOff!;
+    btn.setAttribute('aria-label', on ? d.ariaOn! : d.ariaOff!);
+    btn.setAttribute('aria-pressed', String(on));
+  }
+
+  const root = document.documentElement;
+
+  const themeBtn = document.querySelector<HTMLElement>('[data-theme-toggle]');
+  if (themeBtn) {
+    // Initialize from the DOM, not from an assumption. The pre-paint script
+    // may already have set this, and the two must not disagree.
+    sync(themeBtn, root.dataset.theme === 'light');
+    themeBtn.addEventListener('click', () => {
+      const on = root.dataset.theme !== 'light';
+      if (on) root.dataset.theme = 'light';
+      else delete root.dataset.theme;
+      sync(themeBtn, on);
+      write({ ...read(), theme: on ? 'light' : '' });
+    });
+  }
+
+  const modeBtn = document.querySelector<HTMLElement>('[data-mode-toggle]');
+  if (modeBtn) {
+    sync(modeBtn, root.dataset.mode === 'reader');
+    modeBtn.addEventListener('click', () => {
+      const on = root.dataset.mode !== 'reader';
+      if (on) root.dataset.mode = 'reader';
+      else delete root.dataset.mode;
+      sync(modeBtn, on);
+      write({ ...read(), mode: on ? 'reader' : '' });
+    });
+  }
+
+  const menuBtn = document.querySelector<HTMLElement>('[data-menu-btn]');
+  const menu = document.getElementById('mobile-menu');
+  if (menuBtn && menu) {
+    const setOpen = (open: boolean) => {
+      menu.hidden = !open;
+      menuBtn.setAttribute('aria-expanded', String(open));
+    };
+    menuBtn.addEventListener('click', () => {
+      setOpen(menu.hidden);
+    });
+    // Close after navigating, or the menu stays open behind the new page on
+    // any same-page anchor.
+    menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+  }
+</script>
+
+<style>
+  header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(var(--bg-rgb), 0.85);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    height: 64px;
+  }
+
+  .brand {
+    font-weight: 700;
+    font-size: var(--step-1);
+    color: var(--text-hi);
+  }
+
+  .desktop-nav {
+    display: flex;
+    gap: 24px;
+    margin-left: auto;
+  }
+
+  .nav-link {
+    color: var(--text-muted);
+    font-size: var(--step--1);
+  }
+  .nav-link:hover {
+    color: var(--text-hi);
+  }
+  /* The current page is indicated by more than color, so it survives both a
+     color-blind reader and reader mode. */
+  .nav-link[aria-current='page'] {
+    color: var(--text-hi);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .toggle,
+  .menu-btn {
+    color: var(--text-muted);
+    font-size: var(--step--1);
+    font-family: var(--font-mono);
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    /* WCAG 2.5.8 sets a 24px floor on target size. Small text controls land
+       around 18px without this, and it is a desktop-only failure so it does
+       not show up in a mobile-only audit. */
+    min-height: 24px;
+  }
+  .toggle:hover,
+  .menu-btn:hover {
+    color: var(--text-hi);
+    border-color: var(--text-dim);
+  }
+
+  .menu-btn { display: none; }
+
+  .mobile-nav {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px var(--gutter) 20px;
+    border-top: 1px solid var(--border);
+  }
+  .mobile-nav .nav-link { padding: 10px 0; font-size: var(--step-0); }
+
+  /* Breakpoint chosen from where the layout actually collides, not from a
+     round number. Re-measure if you add nav items. */
+  @media (max-width: 640px) {
+    .desktop-nav { display: none; }
+    .menu-btn { display: inline-flex; }
+    .mobile-nav:not([hidden]) { display: flex; }
+  }
+</style>

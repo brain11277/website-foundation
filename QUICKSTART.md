@@ -6,81 +6,87 @@ your own domain. Roughly 30 to 45 minutes, most of it waiting on DNS.
 This gets you a site that is **structurally correct**. What makes it worth
 visiting is [`BUILDING.md`](./BUILDING.md). Do this first, then go there.
 
-**You need:** Node 20+, a Cloudflare account (free), git, and an AI coding tool
+**You need:** Node 22.12+ (what Astro 7 requires), a Cloudflare account (free), git, and an AI coding tool
 if you want one. A domain is optional until step 7.
 
-*Verified end to end on 2026-09-20 against Astro 7.3.3 and @astrojs/sitemap
-3.7.4: the config below builds clean, emits the right URL shape, and passes
-`verify-indexing.mjs`.*
+*The starter is built and checked against these contracts on every commit to
+this repo, so this page cannot quietly go stale.*
 
 ---
 
-## 1. Scaffold
+## 1. Get the starter
+
+Pull just the starter folder, with no git history attached to it:
 
 ```bash
-npm create astro@latest my-site
+npx degit brain11277/website-foundation/starter my-site
 cd my-site
-npm install @astrojs/sitemap
+npm install
+npm run dev
 ```
 
-Pick the minimal or empty template when prompted, and say yes to TypeScript.
-Astro is the recommendation here because it ships zero JavaScript by default,
-which is most of the performance battle already won. The contracts in
-`FOUNDATION.md` are not Astro-specific, so use something else if you prefer;
-you will just be translating the config yourself.
+Or clone the whole repo and copy it out, if you want the docs locally too:
 
-## 2. Drop in the config
+```bash
+git clone https://github.com/brain11277/website-foundation.git
+cp -R website-foundation/starter my-site
+cd my-site && npm install && npm run dev
+```
 
-Copy these four out of [`templates/`](./templates/):
+That is a complete, working site: correct URL shape, a resolving structured
+data graph, a token system with two themes, full accessibility boilerplate, and
+a 404 that actually renders. It is deliberately plain, because the structure is
+what transfers and the taste is yours.
 
-| File | Goes to | Change |
-|---|---|---|
-| `astro.config.mjs` | project root | `site:` to your domain |
-| `robots.txt` | `public/robots.txt` | the `Sitemap:` domain |
-| `_headers` | `public/_headers` | nothing, unless you add prefixes |
-| `wrangler.jsonc` | project root | `name:` to your project |
+Astro is the choice here because it ships zero JavaScript by default, which is
+most of the performance battle already won. The contracts in `FOUNDATION.md`
+are not Astro-specific; use something else if you prefer and translate the
+config yourself.
 
-The `trailingSlash: 'never'` plus `build.format: 'file'` pairing in the Astro
-config is load-bearing. It is the fix for the bug that started this whole repo,
-where Google reported "Page with redirect" on every page of a site that looked
-completely fine. Do not change it without reading `FOUNDATION.md` §1.
+## 2. Make it yours
+
+Open **`src/site.config.ts`** and work down it. Your domain, your name, your
+profiles. Everything else in the site reads from that one file, including the
+structured data, so there is nothing else to find and replace.
+
+Then `wrangler.jsonc` (the `name` field) and `public/_redirects` (pick a
+canonical host, delete the other).
+
+The `trailingSlash: 'never'` plus `build.format: 'file'` pairing in
+`astro.config.mjs` is load-bearing. It is the fix for the bug that started this
+whole repo, where Google reported "Page with redirect" on every page of a site
+that looked completely fine. Do not change it without reading `FOUNDATION.md`
+§1.
 
 ## 3. Tell your AI what the rules are
 
-If you are building with an AI tool, this is the highest-leverage two minutes in
-the whole process. Create `CLAUDE.md` (or `AGENTS.md`) in the project root:
+The starter already ships a `CLAUDE.md` wired to the baseline: it points at the
+raw contracts, states the workflow, and carries the conventions and a starter
+regression registry.
 
-```markdown
-# CLAUDE.md
+Three sections in it are marked **FILL THIS IN**, and they are the highest
+leverage two minutes in this whole process:
 
-## The baseline
-Read and hold the structural contracts at:
-https://raw.githubusercontent.com/brain11277/website-foundation/main/FOUNDATION.md
+- **What this site is**, and explicitly what it is not.
+- **Voice.** Do this before any copy exists.
+- **Regression registry.** Starts with one worked row; add to it as you go.
 
-Deployment specifics:
-https://raw.githubusercontent.com/brain11277/website-foundation/main/CLOUDFLARE.md
-
-## Workflow (non-negotiable)
-Sync (git fetch, confirm not behind) -> Explore -> Plan in plan mode, no code
--> Code only after I approve -> Commit.
-
-## This site
-<one paragraph: who it is for, what it is for, what it is not>
-
-## Voice
-<see BUILDING.md; write this before you write any copy>
-```
-
-Without this the model will cheerfully generate a site that violates half the
-contracts, and you will not notice until Search Console tells you months later.
+Without those filled in, the model will cheerfully generate a site that reads
+like every other generated site, and it will pass every automated check in this
+repo while doing it.
 
 ## 4. Build something
 
-Stop here and read [`BUILDING.md`](./BUILDING.md) for the page set, the design
-tokens, and the voice guide. Come back when you have pages worth deploying.
+The starter ships a homepage, an about page, a contact page and a 404 with
+placeholder copy. Replace them with something only you could have written.
 
-The minimum for this quickstart to mean anything: a homepage, a real `404.astro`,
-and one content page.
+Before you write any of it, read **[`BUILDING.md`](./BUILDING.md)**: the page
+set, the token system, and the voice guide. The voice guide in particular is
+worth doing first rather than after, because rewriting generated copy costs
+more than steering it did.
+
+`CLAUDE.md` in the starter has three sections marked FILL THIS IN for exactly
+this.
 
 ## 5. Deploy
 
@@ -128,8 +134,11 @@ Turn on **SSL/TLS → Always Use HTTPS**.
 ## 8. Verify before you tell anyone
 
 ```bash
-node scripts/verify-indexing.mjs https://example.com
+npm run verify -- https://example.com
 ```
+
+The starter bundles the checker so this works from your own project, with no
+dependency and nothing to install.
 
 Every sitemap URL must be `200`, not a redirect, with a self-referencing
 canonical and no dangling JSON-LD `@id`. This is the check that catches the
@@ -141,7 +150,9 @@ Nothing gets indexed if nobody knows it exists.
 
 ## 9. Install the machinery
 
-So the contracts survive contact with your future self:
+So the contracts survive contact with your future self. These two live in
+this repo rather than in the starter, because whether you want either depends
+on how you work. Copy them from `templates/`:
 
 - `templates/hooks/session-start.sh` to `.claude/hooks/`, and register it as a
   SessionStart hook. It stops an AI session from designing against a stale base,

@@ -1,0 +1,8 @@
+# public/_redirects
+#
+# Pick ONE canonical host and 301 the other to it. Mixed hosts split your
+# ranking signal and break the contract in FOUNDATION.md §1.
+#
+# Swap the domain, and delete the line you are not using.
+
+https://www.example.com/*  https://example.com/:splat  301

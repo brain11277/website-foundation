@@ -1,0 +1,93 @@
+---
+import { site } from '../site.config';
+import SEOHead from '../components/SEOHead.astro';
+import Fonts from '../components/Fonts.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+import '../styles/tokens.css';
+import '../styles/base.css';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Marks the current nav item. */
+  active?: string;
+  ogImage?: string;
+  ogType?: 'website' | 'article';
+  schema?: object | object[];
+  noSuffix?: boolean;
+  noIndex?: boolean;
+}
+
+const { title, description, active, ogImage, ogType, schema, noSuffix, noIndex } =
+  Astro.props;
+---
+<!DOCTYPE html>
+<html lang={site.locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    {/*
+      Pre-paint theme restore. This MUST stay here, inline, above the styles,
+      and it must not be moved into a bundled script.
+
+      It reads the saved preference and sets the data attributes before the
+      browser resolves styles for the first time, so a returning visitor never
+      sees a flash of the default theme. Deferring it, bundling it, or moving
+      it to the end of <body> reintroduces exactly that flash.
+
+      `is:inline` stops Astro from processing and deferring it. `var` rather
+      than `const` keeps it parseable by anything. The try/catch is for private
+      browsing and blocked storage, where localStorage access throws outright
+      rather than returning null.
+    */}
+    <script is:inline>
+      try {
+        var p = JSON.parse(localStorage.getItem('site.prefs') || '{}');
+        if (p && p.theme) document.documentElement.dataset.theme = p.theme;
+        if (p && p.mode) document.documentElement.dataset.mode = p.mode;
+      } catch (e) {}
+    </script>
+
+    <Fonts />
+    <SEOHead
+      title={title}
+      description={description}
+      ogImage={ogImage}
+      ogType={ogType}
+      schema={schema}
+      noSuffix={noSuffix}
+      noIndex={noIndex}
+    />
+  </head>
+
+  <body>
+    {/* First focusable element on the page, so a keyboard user can jump the nav. */}
+    <a href="#main" class="skip-link">Skip to main content</a>
+
+    <Header active={active} />
+
+    {/*
+      tabindex="-1" is load-bearing and looks removable. Without it the skip
+      link scrolls the viewport to <main> but leaves focus in the nav, so the
+      next Tab lands on the second nav link and the user is back where they
+      started. It makes the element programmatically focusable without adding
+      it to the tab order.
+    */}
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+
+    <Footer />
+  </body>
+</html>
+
+<style>
+  main {
+    /* Room for the fixed header, plus breathing space at the bottom. */
+    padding: 96px 0 120px;
+  }
+</style>
