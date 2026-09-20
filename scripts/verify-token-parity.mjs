@@ -63,7 +63,13 @@ function topLevelRules(css) {
     } else if (c === '}') {
       depth--;
       if (depth === 0) {
-        rules.push({ selector, body: css.slice(start, i) });
+        const body = css.slice(start, i);
+        // `@layer` is cascade ordering, not a condition, so tokens declared
+        // inside one are unconditional and must still satisfy parity. Recurse.
+        // `@media` and `@supports` are deliberately NOT unwrapped: a token
+        // defined only under a condition cannot satisfy a parity contract.
+        if (/^@layer\b/.test(selector)) rules.push(...topLevelRules(body));
+        else rules.push({ selector, body });
         start = i + 1;
       }
     }

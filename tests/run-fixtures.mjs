@@ -75,6 +75,10 @@ const results = [
   // false positives during development.
   await checkScript('verify-token-parity.mjs', [css('parity-ok.css')], 0, 'a stylesheet in parity passes'),
   await checkScript('verify-token-parity.mjs', [css('parity-broken.css')], 1, 'a missing theme override fails'),
+  // @layer is cascade ordering, not a condition, so tokens inside one are
+  // unconditional and parity still applies. Before the parser descended into
+  // it, this file reported "no :root custom properties" and exited 0.
+  await checkScript('verify-token-parity.mjs', [css('parity-layer-broken.css')], 1, 'a missing override inside @layer fails'),
 ];
 
 if (results.every(Boolean)) {
