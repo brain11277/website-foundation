@@ -62,11 +62,14 @@ website-foundation/
 │   └── workflows/
 │       └── data-health.yml    # dead-man's-switch for an automated sync (§5)
 ├── scripts/
-│   └── verify-indexing.mjs    # zero-dep CI check: no redirects, canonical match
+│   └── verify-indexing.mjs    # zero-dep CI check: redirects, canonical, JSON-LD @id graph
+├── tests/
+│   ├── run-fixtures.mjs       # runs the verifier against local fixtures; no network
+│   └── fixtures/              # one site that must pass, one that must fail
 ├── prompts/
 │   └── seo-cross-optimize.md  # paste-ready prompts for honest E-E-A-T / authorship signals
 ├── .github/workflows/
-│   └── ci.yml                 # gitleaks secret scan + script syntax check
+│   └── ci.yml                 # gitleaks secret scan + the verifier's own fixture suite
 ├── .gitignore                 # blocks env files, keys, secrets
 └── LICENSE                    # MIT
 ```
@@ -104,7 +107,8 @@ website-foundation/
 | [`templates/robots.txt`](./templates/robots.txt) | Allows crawl, points at the sitemap. |
 | [`templates/hooks/session-start.sh`](./templates/hooks/session-start.sh) | FOUNDATION §6 as a real hook: refuses to let a session start on a stale base, then verifies your regression markers still exist. |
 | [`templates/workflows/data-health.yml`](./templates/workflows/data-health.yml) | FOUNDATION §5 as a real workflow: asserts your synced data is fresh and **opens an issue** when it isn't, because the dangerous failure is a sync that goes green while doing nothing. |
-| [`scripts/verify-indexing.mjs`](./scripts/verify-indexing.mjs) | Zero-dependency Node script that fetches every sitemap URL and fails on any redirect / non-200 / canonical mismatch. **The check that catches the indexing bug before Google does.** |
+| [`scripts/verify-indexing.mjs`](./scripts/verify-indexing.mjs) | Zero-dependency Node script that fetches every sitemap URL and fails on any redirect, non-200, canonical mismatch, or **unresolved JSON-LD `@id`**. Warns on missing `lastmod`, stray `noindex`, `<h1>` count, and title/description length. **The check that catches the indexing bug before Google does.** |
+| [`tests/run-fixtures.mjs`](./tests/run-fixtures.mjs) | Runs the verifier for real against local fixtures over Node's built-in http server, so the enforcement machinery is itself enforced. No network, no live site. |
 | [`prompts/seo-cross-optimize.md`](./prompts/seo-cross-optimize.md) | Paste-ready prompts + a settings checklist for earning *honest* SEO value (entity/authorship signals, one reciprocal dofollow link) — no link schemes, no keyword stuffing. |
 
 ## For a future AI session

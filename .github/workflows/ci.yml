@@ -29,7 +29,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   verify-script:
-    name: verify-script (syntax)
+    name: verify-script (syntax + fixtures)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,3 +38,10 @@ jobs:
           node-version: 20
       - name: node --check
         run: node --check scripts/verify-indexing.mjs
+      # A syntax check proves the file parses and nothing else. This runs the
+      # verifier for real against local fixtures served from Node's built-in
+      # http module: one site that should pass, one with a dangling JSON-LD
+      # @id that must fail. No network, so CI stays decoupled from any live
+      # site, and the repo's own enforcement machinery is actually exercised.
+      - name: fixture suite
+        run: node tests/run-fixtures.mjs
