@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>A Perfectly Reasonable Title For The Fixture Page</title>
+<meta name="description" content="A fixture page whose description sits inside the 110 to 160 character window, so the verifier has nothing at all to complain about here.">
+<link rel="canonical" href="__ORIGIN__/page">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    { "@id": "__ORIGIN__/#person", "@type": "Person", "name": "Example Person" },
+    { "@id": "__ORIGIN__/#website", "@type": "WebSite", "url": "__ORIGIN__/" },
+    { "@type": "WebPage", "isPartOf": { "@id": "__ORIGIN__/#website" }, "about": { "@id": "__ORIGIN__/#person" } }
+  ]
+}
+</script>
+</head>
+<body><h1>Fixture</h1></body>
+</html>
